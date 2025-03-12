@@ -71,7 +71,7 @@ for i in range(len(B1_folders)):
     volume_data = load_dicoms(CEST_acq, n_meas)
     CEST_data[i] = volume_data
 
-#insert a 0muT B1_value "measurement" for stability puorposeses, also allows for spline fitting since it requires at least 4 data points
+# insert a 0muT B1_value "measurement" for stability puorposeses, also allows for spline fitting since it requires at least 4 data points
 B1_values=np.insert(B1_values,0,0)
 
 CEST_data=np.insert(CEST_data,0,np.ones_like(CEST_data[1]),axis=0) # "Data" for the 0muT B1 measurement
@@ -80,15 +80,16 @@ CEST_data=np.transpose(CEST_data,(1,2,3,4,0)) # CEST_data.shape=[128,128,1,51,4]
 #%% Load B0 + B1 Data
 WASABI_CORR=False # change between WASSR and WASABI B0 correction
 
-WASABI_B0_image=nib.load(str(Path+"B0map.nii")) # Load B0Map
-WASABI_B1_image=nib.load(str(Path+"B1map.nii")) # Load B1 Map
+WASABI_B0_path=os.path.join(data_dir, "B0") 
+WASABI_B0_image=load_dicoms(WASABI_B0_path,1) # load B0Map
+WASABI_B1_path=os.path.join(data_dir, "B1") 
+WASABI_B1_image=load_dicoms(WASABI_B1_path,1) # load B1 Map
 
-WASABI_B1_real=WASABI_B1_image.get_fdata()
-WASABI_B1_real=WASABI_B1_real[:,::-1,:] #changes (reverse) the orientation to correct in MATLAB generated images
-WASABI_B1=np.reshape(WASABI_B1_real,-1) #flattens the matrix
+WASABI_B1_real=WASABI_B1_image[:,:,:,-1] # remove last dimention (freq_offset)
+WASABI_B1=np.reshape(WASABI_B1_real,-1) # flattens the matrix
 
-WASABI_B0_real=WASABI_B0_image.get_fdata()[:,::-1,:]
-WASABI_B0=np.reshape(WASABI_B0_real,-1)
+WASABI_B0_real=WASABI_B0_image[:,:,:,-1] # shape=[128, 128, 1]
+WASABI_B0=np.reshape(WASABI_B0_real,-1) # shape=[16384]
 
 
 #%% make sure the orientation of the data and the B0/B1 Map aligns
