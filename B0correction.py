@@ -21,7 +21,7 @@ def ppval(p, x):
 def EVAL_GluCEST(data_path, seq_path):
     import pypulseq as pp # the import over is not found
     seq = pp.Sequence()
-    print('\n')
+    print('')
     print('--- Reading the sequence protocol. This may take a while ---')
     seq.read(seq_path)
     '''seq.plot(time_range=[0, 0.05])'''  # Plot the sequence protocol. Adjust the time range as needed (in seconds). May need to downgrade to pypulse=1.3.1post1
@@ -114,6 +114,6 @@ def EVAL_GluCEST(data_path, seq_path):
 if __name__ == "__main__":
     globals()["EVAL_GluCEST"] = EVAL_GluCEST 
     EVAL_GluCEST(
-        data_path=r'C:\asb\ntnu\v25\CEST_dicoms\phantom060225\AB_GluCEST_phantom_060225_AB_GluCEST_phantom_060225_1__E13_P1', 
+        data_path=r'C:\asb\ntnu\v25\CEST_dicoms\phantom250206\AB_GluCEST_phantom_060225_AB_GluCEST_phantom_060225_1__E13_P1', 
         seq_path=r'C:\asb\ntnu\v25\CEST_code\CEST_Erlangen\postprocessing\sequence_files\GluCEST_E13_50ms_4uT_3s_sat.seq', 
     )
