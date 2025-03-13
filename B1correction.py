@@ -116,7 +116,7 @@ M0_idx = np.where(abs(offsets) >= abs(m0_offset[0]))[0]  #M0_idx is longer than 
 offsets = np.delete(offsets, M0_idx)
 # n_meas=85
 #%%
-mask = np.squeeze(B1_Data[:, :, :, 0,2]) > 100
+mask = np.squeeze(CEST_data[:, :, :, 0,2]) > 100
 mask_idx = np.where(mask.ravel())[0]
 def make_B0_correction(D4Data,mask_idx):
      # Vectorization
@@ -163,7 +163,7 @@ def make_B0_correction(D4Data,mask_idx):
 
 B1_Data_B0=[]
 for i in range(len(B1_values)):
-     B1_Data_B0.append(make_B0_correction(B1_Data[:,:,:,:,i], mask_idx))
+     B1_Data_B0.append(make_B0_correction(CEST_data[:,:,:,:,i], mask_idx))
 #%%
 B1_Data_B0=np.asarray(B1_Data_B0)
 B1_Data_B0=np.transpose(B1_Data_B0,(1,2,3,4,0))
@@ -174,7 +174,7 @@ ax=fig.add_subplot(231)
 ax.imshow(WASABI_B1_real[:,:,8]*0.6)
 
 ax2=fig.add_subplot(232)
-ax2.imshow(B1_Data[:,:,8,40,2])
+ax2.imshow(CEST_data[:,:,8,40,2])
 
 ax4=fig.add_subplot(234)
 ax4.imshow(B1_Data_B0[:,:,8,40,1])
@@ -243,4 +243,4 @@ ax.set_title("B1 corrected Image")
 affine=np.eye(4)
 
 nib_file=nib.Nifti1Image(B1_corrected_all,affine)
-nib.save(nib_file,Path+"B1_0p6muT_corrected_0p6_lin.nii")
+nib.save(nib_file,"PATH + B1_0p6muT_corrected_0p6_lin.nii")

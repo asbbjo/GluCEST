@@ -20,7 +20,7 @@ import pypulseq as pp
 from bmctool.utils.seq.write import write_seq
 
 # get id of generation file
-seqid = Path(__file__).stem + "_python_v2"
+seqid = Path(__file__).stem + "E28"
 
 # get folder of generation file
 folder = Path(__file__).parent
@@ -33,17 +33,17 @@ FLAG_POST_PREP_SPOIL = True  # add spoiler after preparation block?
 
 # sequence definitions
 defs: dict = {}
-defs["b1pa"] = 4.0  # B1 peak amplitude [µT] (b1rms calculated below)
+defs["b1pa"] = 3.7  # B1 peak amplitude [µT] (b1rms calculated below)
 defs["b1rms"] = defs["b1pa"]  # B1 RMS amplitude [µT]
 defs["b0"] = 7  # B0 [T]
-defs["n_pulses"] = 10  # number of pulses 
+defs["n_pulses"] = 60  # number of pulses 
 defs["tp"] = 50e-3  # pulse duration [s]
 defs["td"] = 0.1e-4  # interpulse delay [s]
-defs["trec"] = 0.1e-4  # recovery time [s]
-defs["trec_m0"] = 0.1e-4  # recovery time before M0 [s]
+defs["trec"] = 1  # recovery time [s]
+defs["trec_m0"] = 1  # recovery time before M0 [s]
 defs["m0_offset"] = -100  # m0 offset [ppm]
 defs["offsets_ppm"] = np.append(defs["m0_offset"],np.concatenate(
-    [np.arange(-5, 0, 0.2), np.arange(0.2, 5.2, 0.2)])) # offset vector [ppm])
+    [np.arange(-5, 0, 0.2), np.arange(0, 5.2, 0.2)])) # offset vector [ppm])
 
 defs["dcsat"] = (defs["tp"]) / (defs["tp"] + defs["td"])  # duty cycle
 defs["num_meas"] = defs["offsets_ppm"].size  # number of repetition
