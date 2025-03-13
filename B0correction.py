@@ -19,11 +19,11 @@ def ppval(p, x):
         return result
 
 def EVAL_GluCEST(data_path, seq_path):
-    import pypulseq as pp
+    import pypulseq as pp # the import over is not found
     seq = pp.Sequence()
     print('--- Reading the sequence protocol. This may take a while ---')
     seq.read(seq_path)
-    '''seq.plot(time_range=[0, 0.05])'''  # Plot the sequence protocol. Adjust the time range as needed (in seconds)
+    '''seq.plot(time_range=[0, 0.05])'''  # Plot the sequence protocol. Adjust the time range as needed (in seconds). May need to downgrade to pypulse=1.3.1post1
 
     offsets = seq.get_definition("offsets_ppm")
     m0_offset = seq.get_definition("M0_offset")
@@ -36,7 +36,7 @@ def EVAL_GluCEST(data_path, seq_path):
     collection = [pydicom.dcmread(os.path.join(dcmpath, filename)) for filename in sorted(os.listdir(dcmpath))]
     # extract the volume data
     V = np.stack([dcm.pixel_array for dcm in collection])
-    V = np.transpose(V, (1, 2, 0))
+    V = np.transpose(V[:,:,:,-1], (1, 2, 0)) # erase the last dimention due to jpeg format ([52,128,128,3] => [52,128,128])
     sz = V.shape
     V = np.reshape(V, [sz[0], sz[1], n_meas, sz[2] // n_meas]).transpose(0, 1, 3, 2)
 
@@ -56,7 +56,7 @@ def EVAL_GluCEST(data_path, seq_path):
     else:
         print("m0_offset not found in offset")
     
-    print('--- Correction of data ---')
+    print('--- B0 correction of data ---')
     Z_corr = np.zeros_like(Z)
     w = offsets
     dB0_stack = np.zeros(Z.shape[1]) # could be changes for wasabi
@@ -90,20 +90,20 @@ def EVAL_GluCEST(data_path, seq_path):
         ).transpose(1, 2, 3, 0)
 
     print('--- Plotting ---')
-    slice_of_interest = 0  # pick slice for Evaluation
-    desired_offset = 3
-    offset_of_interest = np.where(offsets == desired_offset)[0]  # pick offset for Evaluation
+    slice_of_interest = 0 # pick slice for evaluation (0 if only one slice)
+    desired_offset = 3 # pick offset for evaluation (3 for GluCEST at 3 ppm)
+    offset_of_interest = np.where(offsets == desired_offset)[0]  
     w_offset_of_interest = offsets[offset_of_interest]
 
     plt.figure(figsize=(10, 4))
     plt.subplot(1, 2, 1)
-    vmin, vmax = 0.5, 1
+    vmin, vmax = 0.5, 1 # Z-spectra range
     im = plt.imshow(V_Z_corr_reshaped[:,:,slice_of_interest,offset_of_interest], vmin=vmin, vmax=vmax, cmap='rainbow')
     cb = plt.colorbar(im, format="%.2f")
     cb.set_ticks(np.linspace(vmin, vmax, 5)) 
     plt.title("Z(Δω) = %.2f ppm" % w_offset_of_interest)
     plt.subplot(1, 2, 2)
-    vmin, vmax = -0.12, 0.12
+    vmin, vmax = -0.20, 0.20 # set GluCEST contrast range
     im = plt.imshow(V_MTRasym_reshaped[:,:,slice_of_interest,offset_of_interest], vmin=vmin, vmax=vmax, cmap='rainbow')
     cb = plt.colorbar(im, format="%.2f")
     cb.set_ticks(np.linspace(vmin, vmax, 5)) 

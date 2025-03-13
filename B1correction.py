@@ -7,10 +7,10 @@
 
 import numpy as np
 from matplotlib import pyplot as plt
-
+import os
 import nibabel as nib
 from natsort import natsorted
-
+import pydicom
 import pypulseq as pp
 
 from csaps import csaps
@@ -29,52 +29,77 @@ def ppval(p, x):
              result = result * x + p[i]
          return result
 
-#%% Load niftis
-Path="C:/Users/UserName/RestOfYourPath"
+#%% Load dcm
+data_dir=r'C:\asb\ntnu\v25\CEST_dicoms\phantomB1corr' 
+seq_dir=r'C:\asb\ntnu\v25\CEST_dicoms\phantomB1corr\sequence_files'
 
 #File Names of your nifits
-B1_levels=["B1_0p4muT.nii","B1_0p6muT.nii","B1_0p9muT.nii"]
-B1_values=[0.4,0.6,0.9] # B1 values of your nifties, the one in the middle is the one to which all values are corrected to
-def load_nifti(Path,File_Name):
-     file=nib.load(str(Path+File_Name))
-     return file.get_fdata()
+B1_folders=["E11","E12","E13"]
+B1_sequences=["E11.seq","E12.seq","E13.seq"]
+B1_values=[2.0,2.5,3.0] # B1 values of your dicoms, the one in the middle is the one to which all values are corrected to
 
-B1_Data=[]
+def load_dicoms(CEST_acq, n_meas):
+    # check data path
+    dcmpath = CEST_acq
+    os.chdir(dcmpath)
+    # read data from dicom directory
+    collection = [pydicom.dcmread(os.path.join(dcmpath, filename)) for filename in sorted(os.listdir(dcmpath))]
+    # extract the volume data
+    V = np.stack([dcm.pixel_array for dcm in collection])
+    V = np.transpose(V, (1, 2, 0))
+    sz = V.shape
+    V = np.reshape(V, [sz[0], sz[1], n_meas, sz[2] // n_meas]).transpose(0, 1, 3, 2) # V.shape=[x,y,z,freq_offset]
+    return V
 
-for i in range(len(B1_levels)):
-     Spec=load_nifti(Path, B1_levels[i])
-     B1_Data.append(Spec)
+print('')
+print('--- Reading the sequence protocol. This may take a while ---')
+CEST_data=np.empty((3,128,128,1,51))
+for i in range(len(B1_folders)):
+    print(f"Managing B1 acquisition {i+1}")
+    # find the folder for each acquisition
+    CEST_acq = os.path.join(data_dir, B1_folders[i])
+    CEST_seq = os.path.join(seq_dir, B1_sequences[i])
 
-#insert a 0muT B1_value "measurement" for stability puorposeses, also allows for spline fitting since it requires at least 4 data points
+    # read the sequence file
+    seq = pp.Sequence()
+    seq.read(CEST_seq)
+    offsets = seq.get_definition("offsets_ppm")
+    m0_offset = seq.get_definition("M0_offset")
+    n_meas = len(offsets) # these parameters will be set by the B1 folder. Assume that all acq are equal
+
+    # extract volume data
+    volume_data = load_dicoms(CEST_acq, n_meas)
+    CEST_data[i] = volume_data
+
+# insert a 0muT B1_value "measurement" for stability puorposeses, also allows for spline fitting since it requires at least 4 data points
 B1_values=np.insert(B1_values,0,0)
 
-B1_Data=np.asarray(B1_Data)
-B1_Data=np.insert(B1_Data,0,np.ones_like(B1_Data[1]),axis=0) # "Data" for the 0muT B1 measurement
-B1_Data=np.transpose(B1_Data,(1,2,3,4,0))
-
+CEST_data=np.insert(CEST_data,0,np.ones_like(CEST_data[1]),axis=0) # "Data" for the 0muT B1 measurement
+CEST_data=np.transpose(CEST_data,(1,2,3,4,0)) # CEST_data.shape=[128,128,1,51,4]
 
 #%% Load B0 + B1 Data
 WASABI_CORR=False # change between WASSR and WASABI B0 correction
 
-WASABI_B0_image=nib.load(str(Path+"B0map.nii")) # Load B0Map
-WASABI_B1_image=nib.load(str(Path+"B1map.nii")) # Load B1 Map
+WASABI_B0_path=os.path.join(data_dir, "B0") 
+WASABI_B0_image=load_dicoms(WASABI_B0_path,1) # load B0Map
+WASABI_B1_path=os.path.join(data_dir, "B1") 
+WASABI_B1_image=load_dicoms(WASABI_B1_path,1) # load B1 Map
 
-WASABI_B1_real=WASABI_B1_image.get_fdata()
-WASABI_B1_real=WASABI_B1_real[:,::-1,:] #changes the orientation to correct in MATLAB generated images
-WASABI_B1=np.reshape(WASABI_B1_real,-1)
+WASABI_B1_real=WASABI_B1_image[:,:,:,-1] # remove last dimention (freq_offset)
+WASABI_B1=np.reshape(WASABI_B1_real,-1) # flattens the matrix
 
-WASABI_B0_real=WASABI_B0_image.get_fdata()[:,::-1,:]
-WASABI_B0=np.reshape(WASABI_B0_real,-1)
+WASABI_B0_real=WASABI_B0_image[:,:,:,-1] # shape=[128, 128, 1]
+WASABI_B0=np.reshape(WASABI_B0_real,-1) # shape=[16384]
 
 
 #%% make sure the orientation of the data and the B0/B1 Map aligns
 plt.close("all")
 fig=plt.figure(13)
 ax=fig.add_subplot(121)
-ax.imshow(WASABI_B1_real[:,:,3])
+ax.imshow(WASABI_B1_real[:,:,1])
 
 ax2=fig.add_subplot(122)
-ax2.imshow(B1_Data[:,:,3,40,2])
+ax2.imshow(CEST_data[:,:,1,40,2])
 
 
 #%% Sequence Stuff
@@ -91,7 +116,7 @@ M0_idx = np.where(abs(offsets) >= abs(m0_offset[0]))[0]  #M0_idx is longer than 
 offsets = np.delete(offsets, M0_idx)
 # n_meas=85
 #%%
-mask = np.squeeze(B1_Data[:, :, :, 0,2]) > 100
+mask = np.squeeze(CEST_data[:, :, :, 0,2]) > 100
 mask_idx = np.where(mask.ravel())[0]
 def make_B0_correction(D4Data,mask_idx):
      # Vectorization
@@ -127,13 +152,9 @@ def make_B0_correction(D4Data,mask_idx):
                  Z_corr[:, ii] = ppval(pp, (w + WASABI_B0[ii]))
      # Vectorization Backwards
      if Z.shape[1] > 1:
-         V_Z_corr = np.zeros((V_m_z.shape[0], V_m_z.shape[1]),
-dtype=float)
+         V_Z_corr = np.zeros((V_m_z.shape[0], V_m_z.shape[1]), dtype=float)
          V_Z_corr[len(m0_offset):, mask_idx] = Z_corr
-         V_Z_corr_reshaped = V_Z_corr.reshape(
-             D4Data.shape[3], D4Data.shape[0], D4Data.shape[1],
-D4Data.shape[2]
-         ).transpose(1, 2, 3, 0)
+         V_Z_corr_reshaped = V_Z_corr.reshape(D4Data.shape[3], D4Data.shape[0], D4Data.shape[1], D4Data.shape[2]).transpose(1, 2, 3, 0)
 
          return V_Z_corr_reshaped
      else:
@@ -142,7 +163,7 @@ D4Data.shape[2]
 
 B1_Data_B0=[]
 for i in range(len(B1_values)):
-     B1_Data_B0.append(make_B0_correction(B1_Data[:,:,:,:,i], mask_idx))
+     B1_Data_B0.append(make_B0_correction(CEST_data[:,:,:,:,i], mask_idx))
 #%%
 B1_Data_B0=np.asarray(B1_Data_B0)
 B1_Data_B0=np.transpose(B1_Data_B0,(1,2,3,4,0))
@@ -153,7 +174,7 @@ ax=fig.add_subplot(231)
 ax.imshow(WASABI_B1_real[:,:,8]*0.6)
 
 ax2=fig.add_subplot(232)
-ax2.imshow(B1_Data[:,:,8,40,2])
+ax2.imshow(CEST_data[:,:,8,40,2])
 
 ax4=fig.add_subplot(234)
 ax4.imshow(B1_Data_B0[:,:,8,40,1])
@@ -222,4 +243,4 @@ ax.set_title("B1 corrected Image")
 affine=np.eye(4)
 
 nib_file=nib.Nifti1Image(B1_corrected_all,affine)
-nib.save(nib_file,Path+"B1_0p6muT_corrected_0p6_lin.nii")
+nib.save(nib_file,"PATH + B1_0p6muT_corrected_0p6_lin.nii")
