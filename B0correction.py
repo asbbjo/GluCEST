@@ -21,7 +21,6 @@ def ppval(p, x):
 def EVAL_GluCEST(data_path, seq_path):
     import pypulseq as pp # the import over is not found
     seq = pp.Sequence()
-    print('')
     print('--- Reading the sequence protocol. This may take a while ---')
     seq.read(seq_path)
     '''seq.plot(time_range=[0, 0.05])'''  # Plot the sequence protocol. Adjust the time range as needed (in seconds). May need to downgrade to pypulse=1.3.1post1
@@ -37,12 +36,12 @@ def EVAL_GluCEST(data_path, seq_path):
     collection = [pydicom.dcmread(os.path.join(dcmpath, filename)) for filename in sorted(os.listdir(dcmpath))]
     # extract the volume data
     V = np.stack([dcm.pixel_array for dcm in collection])
-    V = np.transpose(V, (1, 2, 0))
+    V = np.transpose(V[:,:,:,-1], (1, 2, 0)) # erase the last dimention due to jpeg format ([52,128,128,3] => [52,128,128])
     sz = V.shape
     V = np.reshape(V, [sz[0], sz[1], n_meas, sz[2] // n_meas]).transpose(0, 1, 3, 2)
 
     # Vectorization
-    threshold = 150 #np.max(V)*0.1 # threshold of 10%
+    threshold = 100 #np.max(V)*0.1 # threshold of 10%
     mask = np.squeeze(V[:, :, :, 0]) > threshold
     mask_idx = np.where(mask.ravel())[0]
     V_m_z = V.reshape(-1, n_meas).T
@@ -104,7 +103,7 @@ def EVAL_GluCEST(data_path, seq_path):
     cb.set_ticks(np.linspace(vmin, vmax, 5)) 
     plt.title("Z(Δω) = %.2f ppm" % w_offset_of_interest)
     plt.subplot(1, 2, 2)
-    vmin, vmax = -0.12, 0.12 # set GluCEST contrast range
+    vmin, vmax = -0.20, 0.20 # set GluCEST contrast range
     im = plt.imshow(V_MTRasym_reshaped[:,:,slice_of_interest,offset_of_interest], vmin=vmin, vmax=vmax, cmap='rainbow')
     cb = plt.colorbar(im, format="%.2f")
     cb.set_ticks(np.linspace(vmin, vmax, 5)) 
@@ -114,6 +113,6 @@ def EVAL_GluCEST(data_path, seq_path):
 if __name__ == "__main__":
     globals()["EVAL_GluCEST"] = EVAL_GluCEST 
     EVAL_GluCEST(
-        data_path=r'C:\asb\ntnu\v25\CEST_dicoms\phantom250206\AB_GluCEST_phantom_060225_AB_GluCEST_phantom_060225_1__E13_P1', 
-        seq_path=r'C:\asb\ntnu\v25\CEST_code\CEST_Erlangen\postprocessing\sequence_files\GluCEST_E13_50ms_4uT_3s_sat.seq', 
+        data_path=r'C:\asb\ntnu\MRIscans\250312\dicoms\E28', 
+        seq_path=r'C:\asb\ntnu\MRIscans\250312\seq_files\seq_file_E28.seq'
     )
