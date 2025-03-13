@@ -6,6 +6,7 @@ import numpy as np
 import pydicom
 import pypulseq as pp
 from csaps import csaps
+import scipy as sc
 
 def ppval(p, x):
     # helper function to evaluate piecewise polinomial
@@ -109,6 +110,92 @@ def EVAL_GluCEST(data_path, seq_path):
     cb.set_ticks(np.linspace(vmin, vmax, 5)) 
     plt.title("MTRasym(Δω) = %.2f ppm" % w_offset_of_interest)
     plt.show()
+
+    # Spectrum handling phantom
+    array_Z = V_Z_corr_reshaped[47:52,74:79,0,1:]
+    flattened_vectors_Z = array_Z.reshape(-1, array_Z.shape[-1]) 
+    average_vector_Z = flattened_vectors_Z.mean(axis=0)
+
+    array_MTR = V_MTRasym_reshaped[47:52,74:79,0,1:]
+    flattened_vectors_MTR = array_MTR.reshape(-1, array_MTR.shape[-1]) 
+    average_vector_MTR = flattened_vectors_MTR.mean(axis=0)
+
+    Z_spectrum = average_vector_Z #V_Z_corr_reshaped[34,50,0,1:]        np.mean(Z_corr, axis=1)
+    MTR_spectrum = average_vector_MTR #V_MTRasym_reshaped[34,50,0,1:]   np.mean(MTRasym, axis=1)
+    
+    plt.figure(figsize=(10, 4))
+    plt.subplot(1, 2, 1)
+    plt.plot(w, Z_spectrum, "r.-")
+    plt.gca().invert_xaxis()
+    plt.title("Mean Z-spectrum in 10 mM")
+    
+    plt.subplot(1, 2, 2)
+    plt.plot(w, MTR_spectrum, "b.-")
+    plt.xlim([0, 4])
+    plt.gca().invert_xaxis()
+    plt.title("Mean MTRasym-spectrum in 10 mM")
+    plt.show()
+
+    
+    V_MTRasym_reshaped_pc = V_MTRasym_reshaped*100
+    print('0mM')
+    mm0 = V_MTRasym_reshaped_pc[66:71, 80:85, slice_of_interest, offset_of_interest]
+    mm0_avg, mm0_sem = np.mean(mm0.reshape(-1)), sc.stats.sem(mm0.reshape(-1))
+    print(mm0_avg)
+    print(mm0_sem)
+
+    print('2mM')
+    mm2 = V_MTRasym_reshaped_pc[81:86, 67:72, slice_of_interest, offset_of_interest]
+    mm2_avg, mm2_sem = np.mean(mm2.reshape(-1)), sc.stats.sem(mm2.reshape(-1))
+    print(mm2_avg)
+    print(mm2_sem)
+
+    print('4mM')
+    mm4 = V_MTRasym_reshaped_pc[76:81, 47:52, slice_of_interest, offset_of_interest]
+    mm4_avg, mm4_sem = np.mean(mm4.reshape(-1)), sc.stats.sem(mm4.reshape(-1))
+    print(mm4_avg)
+    print(mm4_sem)
+
+    print('6mM')
+    mm6 = V_MTRasym_reshaped_pc[57:62, 41:46, slice_of_interest, offset_of_interest]
+    mm6_avg, mm6_sem = np.mean(mm6.reshape(-1)), sc.stats.sem(mm6.reshape(-1))
+    print(mm6_avg)
+    print(mm6_sem)
+
+    print('8mM')
+    mm8 = V_MTRasym_reshaped_pc[43:48, 54:59, slice_of_interest, offset_of_interest]
+    mm8_avg, mm8_sem = np.mean(mm8.reshape(-1)), sc.stats.sem(mm8.reshape(-1))
+    print(mm8_avg)
+    print(mm8_sem)
+
+    print('10mM')
+    mm10 = V_MTRasym_reshaped_pc[47:52, 74:79, slice_of_interest, offset_of_interest]
+    mm10_avg, mm10_sem = np.mean(mm10.reshape(-1)), sc.stats.sem(mm10.reshape(-1))
+    print(mm10_avg)
+    print(mm10_sem)
+
+    mm = np.array([0,2,4,6,8,10])
+    mm_avg = np.array([mm0_avg, mm2_avg, mm4_avg, mm6_avg, mm8_avg, mm10_avg])
+    mm_sem = np.array([mm0_sem, mm2_sem, mm4_sem, mm6_sem, mm8_sem, mm10_sem])
+
+    # Plot data with error bars
+    plt.errorbar(mm, mm_avg, yerr=mm_sem, fmt='o', label="Averages of data with SEM", capsize=6)
+
+    # Fit a linear trend line
+    slope, intercept = np.polyfit(mm, mm_avg, 1)  # Linear fit (degree=1)
+    trend_line = slope * mm + intercept  # Calculate trend line values
+
+    # Plot the trend line
+    plt.plot(mm, trend_line, 'r--', label=f"Trend: y={slope:.2f}x + {intercept:.2f}")
+
+    # Labels and legend
+    plt.xlabel("Concentration of Glu [mM]")
+    plt.ylabel("MTRasym contrast [%]")
+    plt.title("Linear trend with concentrations")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+    
 
 if __name__ == "__main__":
     globals()["EVAL_GluCEST"] = EVAL_GluCEST 
