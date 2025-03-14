@@ -22,7 +22,7 @@ def ppval(p, x):
 def EVAL_GluCEST(data_path, seq_path):
     import pypulseq as pp # the import over is not found
     seq = pp.Sequence()
-    print('--- Reading the sequence protocol. This may take a while ---')
+    print('--- Reading the sequence protocol ---')
     seq.read(seq_path)
     '''seq.plot(time_range=[0, 0.05])'''  # Plot the sequence protocol. Adjust the time range as needed (in seconds). May need to downgrade to pypulse=1.3.1post1
 
@@ -136,7 +136,7 @@ def EVAL_GluCEST(data_path, seq_path):
     plt.title("Mean MTRasym-spectrum in 10 mM")
     plt.show()
 
-    
+    print('MTRasym contrast for each concentration:')
     V_MTRasym_reshaped_pc = V_MTRasym_reshaped*100
     print('0mM')
     mm0 = V_MTRasym_reshaped_pc[66:71, 80:85, slice_of_interest, offset_of_interest]
@@ -200,6 +200,6 @@ def EVAL_GluCEST(data_path, seq_path):
 if __name__ == "__main__":
     globals()["EVAL_GluCEST"] = EVAL_GluCEST 
     EVAL_GluCEST(
-        data_path=r'C:\asb\ntnu\MRIscans\250312\dicoms\E28', 
-        seq_path=r'C:\asb\ntnu\MRIscans\250312\seq_files\seq_file_E28.seq'
+        data_path=r'C:\asb\ntnu\MRIscans\250312\dicoms\E23', 
+        seq_path=r'C:\asb\ntnu\MRIscans\250312\seq_files\seq_file_E23.seq'
     )
