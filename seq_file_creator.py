@@ -1,15 +1,11 @@
-# Glu_7T_001_3uT_8Hannning_DC99_800ms
+# Glu_7T_001_3p7uT_block_50ms
 # Glutamate weighted protocol according to https://doi.org/10.1002/mrm.27362
+# Pipeline from https://github.com/kherz/pulseq-cest-library/tree/master/ 
 #
-# IMPORTANT INFO: if you get an AssertionError in the timing check, just comment out the corresponding assert statement:
-#       "assert abs(duration - block_duration) < eps"
-# in pypulseq\Sequence\block.py. This is a known bug in pypulseq 1.3.1post1.
+# Tested with pypulseq version 1.3.1post1, bmctool version 0.6.0, and numpy 1.23.5
 #
-# Tested with pypulseq version 1.3.1post1 and bmctool version 0.6.0
-# Using block pulse
-#
-# Patrick Schuenke 2023
-# patrick.schuenke@ptb.de
+# Asbjørn Bjørkkjær 2025
+# asbjorn.bjorkkjar@ntnu.no
 
 from pathlib import Path
 
@@ -39,8 +35,8 @@ defs["b0"] = 7  # B0 [T]
 defs["n_pulses"] = 60  # number of pulses 
 defs["tp"] = 50e-3  # pulse duration [s]
 defs["td"] = 0.1e-4  # interpulse delay [s]
-defs["trec"] = 1  # recovery time [s]
-defs["trec_m0"] = 1  # recovery time before M0 [s]
+defs["trec"] = 0.1e-5  # recovery time [s]
+defs["trec_m0"] = 0.1e-5  # recovery time before M0 [s]
 defs["m0_offset"] = -100  # m0 offset [ppm]
 defs["offsets_ppm"] = np.append(defs["m0_offset"],np.concatenate(
     [np.arange(-5, 0, 0.2), np.arange(0, 5.2, 0.2)])) # offset vector [ppm])
