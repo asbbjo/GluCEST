@@ -8,6 +8,11 @@ import pypulseq as pp
 from csaps import csaps
 import scipy as sc
 
+# Store dicoms of each offsets in one folder
+# Create a sequence file for the acquisition
+# Run with pypulseq==1.4.2 and pydicom==3.0.1
+# Make sure to have Grassroots DICOM (pip install gdcm) and pylibjpeg (pip install pylibjpeg pylibjpeg-libjpeg)
+
 def ppval(p, x):
     # helper function to evaluate piecewise polinomial
     if callable(p):
