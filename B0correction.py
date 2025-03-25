@@ -117,11 +117,13 @@ def EVAL_GluCEST(data_path, seq_path):
     plt.show()
 
     # Spectrum handling phantom
-    array_Z = V_Z_corr_reshaped[47:52,74:79,0,1:]
+    # pixels_10mm = [47,52,74,79] # 250317
+    pixels_10mm = [54,59,42,47] # 250324
+    array_Z = V_Z_corr_reshaped[pixels_10mm[0]:pixels_10mm[1],pixels_10mm[2]:pixels_10mm[3],0,1:]
     flattened_vectors_Z = array_Z.reshape(-1, array_Z.shape[-1]) 
     average_vector_Z = flattened_vectors_Z.mean(axis=0)
 
-    array_MTR = V_MTRasym_reshaped[47:52,74:79,0,1:]
+    array_MTR = V_MTRasym_reshaped[pixels_10mm[0]:pixels_10mm[1],pixels_10mm[2]:pixels_10mm[3],0,1:]
     flattened_vectors_MTR = array_MTR.reshape(-1, array_MTR.shape[-1]) 
     average_vector_MTR = flattened_vectors_MTR.mean(axis=0)
 
@@ -144,37 +146,48 @@ def EVAL_GluCEST(data_path, seq_path):
     print('MTRasym contrast for each concentration:')
     V_MTRasym_reshaped_pc = V_MTRasym_reshaped*100
     print('0mM')
-    mm0 = V_MTRasym_reshaped_pc[66:71, 80:85, slice_of_interest, offset_of_interest]
+    #pixels_0mm = [66,71,80,85] # 250317
+    pixels_0mm = [40,45,56,61] # 250317
+    mm0 = V_MTRasym_reshaped_pc[pixels_0mm[0]:pixels_0mm[1],pixels_0mm[2]:pixels_0mm[3], slice_of_interest, offset_of_interest]
     mm0_avg, mm0_sem = np.mean(mm0.reshape(-1)), sc.stats.sem(mm0.reshape(-1))
     print(mm0_avg)
     print(mm0_sem)
 
     print('2mM')
-    mm2 = V_MTRasym_reshaped_pc[81:86, 67:72, slice_of_interest, offset_of_interest]
+    #pixels_2mm = [81,86,67,72] # 250317
+    pixels_2mm = [44,49,75,80] # 250324
+    mm2 = V_MTRasym_reshaped_pc[pixels_2mm[0]:pixels_2mm[1],pixels_2mm[2]:pixels_2mm[3], slice_of_interest, offset_of_interest]
     mm2_avg, mm2_sem = np.mean(mm2.reshape(-1)), sc.stats.sem(mm2.reshape(-1))
     print(mm2_avg)
     print(mm2_sem)
 
     print('4mM')
-    mm4 = V_MTRasym_reshaped_pc[76:81, 47:52, slice_of_interest, offset_of_interest]
+    #pixels_4mm = [76,81,47,52] # 250317
+    pixels_4mm = [62,67,81,86] # 250324
+    mm4 = V_MTRasym_reshaped_pc[pixels_4mm[0]:pixels_4mm[1],pixels_4mm[2]:pixels_4mm[3], slice_of_interest, offset_of_interest]
     mm4_avg, mm4_sem = np.mean(mm4.reshape(-1)), sc.stats.sem(mm4.reshape(-1))
     print(mm4_avg)
     print(mm4_sem)
 
     print('6mM')
-    mm6 = V_MTRasym_reshaped_pc[57:62, 41:46, slice_of_interest, offset_of_interest]
+    #pixels_6mm = [57,62,41,46] # 250317
+    pixels_6mm = [77,82,67,72] # 250324
+    mm6 = V_MTRasym_reshaped_pc[pixels_6mm[0]:pixels_6mm[1],pixels_6mm[2]:pixels_6mm[3], slice_of_interest, offset_of_interest]
     mm6_avg, mm6_sem = np.mean(mm6.reshape(-1)), sc.stats.sem(mm6.reshape(-1))
     print(mm6_avg)
     print(mm6_sem)
 
     print('8mM')
-    mm8 = V_MTRasym_reshaped_pc[43:48, 54:59, slice_of_interest, offset_of_interest]
+    #pixels_8mm = [43,48,54,59] # 250317
+    pixels_8mm = [72,77,48,53] # 250324
+    mm8 = V_MTRasym_reshaped_pc[pixels_8mm[0]:pixels_8mm[1],pixels_8mm[2]:pixels_8mm[3], slice_of_interest, offset_of_interest]
     mm8_avg, mm8_sem = np.mean(mm8.reshape(-1)), sc.stats.sem(mm8.reshape(-1))
     print(mm8_avg)
     print(mm8_sem)
 
     print('10mM')
-    mm10 = V_MTRasym_reshaped_pc[47:52, 74:79, slice_of_interest, offset_of_interest]
+    pixels_10mm = pixels_10mm
+    mm10 = V_MTRasym_reshaped_pc[pixels_10mm[0]:pixels_10mm[1],pixels_10mm[2]:pixels_10mm[3], slice_of_interest, offset_of_interest]
     mm10_avg, mm10_sem = np.mean(mm10.reshape(-1)), sc.stats.sem(mm10.reshape(-1))
     print(mm10_avg)
     print(mm10_sem)
@@ -198,13 +211,13 @@ def EVAL_GluCEST(data_path, seq_path):
     plt.ylabel("MTRasym contrast [%]")
     plt.title("Linear trend with concentrations")
     plt.legend()
-    plt.grid(True)
+    '''plt.grid(True)'''
     plt.show()
     
 
 if __name__ == "__main__":
     globals()["EVAL_GluCEST"] = EVAL_GluCEST 
     EVAL_GluCEST(
-        data_path=r'C:\asb\ntnu\MRIscans\250317\dicoms\E25', 
-        seq_path=r'C:\asb\ntnu\MRIscans\250317\seq_files\seq_file_E25.seq'
+        data_path=r'C:\asb\ntnu\MRIscans\250324\dicoms\E18', 
+        seq_path=r'C:\asb\ntnu\MRIscans\250324\seq_files\seq_file_E18.seq'
     )
