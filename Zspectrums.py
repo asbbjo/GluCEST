@@ -95,13 +95,12 @@ def EVAL_GluCEST(data_path, seq_path):
             V.shape[3], V.shape[0], V.shape[1], V.shape[2]
         ).transpose(1, 2, 3, 0)
 
-    print('--- Plotting ---')
     slice_of_interest = 0 # pick slice for evaluation (0 if only one slice)
     desired_offset = 3 # pick offset for evaluation (3 for GluCEST at 3 ppm)
     offset_of_interest = np.where(offsets == desired_offset)[0]  
     w_offset_of_interest = offsets[offset_of_interest]
 
-    plt.figure(figsize=(10, 4))
+    '''plt.figure(figsize=(10, 4))
     plt.subplot(1, 2, 1)
     vmin, vmax = 0.5, 1 # Z-spectra range
     im = plt.imshow(V_Z_corr_reshaped[:,:,slice_of_interest,offset_of_interest], vmin=vmin, vmax=vmax, cmap='rainbow')
@@ -114,7 +113,7 @@ def EVAL_GluCEST(data_path, seq_path):
     cb = plt.colorbar(im, format="%.2f")
     cb.set_ticks(np.linspace(vmin, vmax, 5)) 
     plt.title("MTRasym(Δω) = %.2f ppm" % w_offset_of_interest)
-    plt.show()
+    plt.show()'''
 
     # Spectrum handling phantom
     # pixels_10mm = [47,52,74,79] # 250317
@@ -127,10 +126,12 @@ def EVAL_GluCEST(data_path, seq_path):
     flattened_vectors_MTR = array_MTR.reshape(-1, array_MTR.shape[-1]) 
     average_vector_MTR = flattened_vectors_MTR.mean(axis=0)
 
-    Z_spectrum = average_vector_Z #V_Z_corr_reshaped[34,50,0,1:]        np.mean(Z_corr, axis=1)
-    MTR_spectrum = average_vector_MTR #V_MTRasym_reshaped[34,50,0,1:]   np.mean(MTRasym, axis=1)
+    Z_spectrum = average_vector_Z
+    MTR_spectrum = average_vector_MTR
+
+    return w, Z_spectrum, MTR_spectrum
     
-    plt.figure(figsize=(10, 4))
+    '''plt.figure(figsize=(10, 4))
     plt.subplot(1, 2, 1)
     plt.plot(w, Z_spectrum, "r.-")
     plt.gca().invert_xaxis()
@@ -146,48 +147,37 @@ def EVAL_GluCEST(data_path, seq_path):
     print('MTRasym contrast for each concentration:')
     V_MTRasym_reshaped_pc = V_MTRasym_reshaped*100
     print('0mM')
-    #pixels_0mm = [66,71,80,85] # 250317
-    pixels_0mm = [40,45,56,61] # 250317
-    mm0 = V_MTRasym_reshaped_pc[pixels_0mm[0]:pixels_0mm[1],pixels_0mm[2]:pixels_0mm[3], slice_of_interest, offset_of_interest]
+    mm0 = V_MTRasym_reshaped_pc[66:71, 80:85, slice_of_interest, offset_of_interest]
     mm0_avg, mm0_sem = np.mean(mm0.reshape(-1)), sc.stats.sem(mm0.reshape(-1))
     print(mm0_avg)
     print(mm0_sem)
 
     print('2mM')
-    #pixels_2mm = [81,86,67,72] # 250317
-    pixels_2mm = [44,49,75,80] # 250324
-    mm2 = V_MTRasym_reshaped_pc[pixels_2mm[0]:pixels_2mm[1],pixels_2mm[2]:pixels_2mm[3], slice_of_interest, offset_of_interest]
+    mm2 = V_MTRasym_reshaped_pc[81:86, 67:72, slice_of_interest, offset_of_interest]
     mm2_avg, mm2_sem = np.mean(mm2.reshape(-1)), sc.stats.sem(mm2.reshape(-1))
     print(mm2_avg)
     print(mm2_sem)
 
     print('4mM')
-    #pixels_4mm = [76,81,47,52] # 250317
-    pixels_4mm = [62,67,81,86] # 250324
-    mm4 = V_MTRasym_reshaped_pc[pixels_4mm[0]:pixels_4mm[1],pixels_4mm[2]:pixels_4mm[3], slice_of_interest, offset_of_interest]
+    mm4 = V_MTRasym_reshaped_pc[76:81, 47:52, slice_of_interest, offset_of_interest]
     mm4_avg, mm4_sem = np.mean(mm4.reshape(-1)), sc.stats.sem(mm4.reshape(-1))
     print(mm4_avg)
     print(mm4_sem)
 
     print('6mM')
-    #pixels_6mm = [57,62,41,46] # 250317
-    pixels_6mm = [77,82,67,72] # 250324
-    mm6 = V_MTRasym_reshaped_pc[pixels_6mm[0]:pixels_6mm[1],pixels_6mm[2]:pixels_6mm[3], slice_of_interest, offset_of_interest]
+    mm6 = V_MTRasym_reshaped_pc[57:62, 41:46, slice_of_interest, offset_of_interest]
     mm6_avg, mm6_sem = np.mean(mm6.reshape(-1)), sc.stats.sem(mm6.reshape(-1))
     print(mm6_avg)
     print(mm6_sem)
 
     print('8mM')
-    #pixels_8mm = [43,48,54,59] # 250317
-    pixels_8mm = [72,77,48,53] # 250324
-    mm8 = V_MTRasym_reshaped_pc[pixels_8mm[0]:pixels_8mm[1],pixels_8mm[2]:pixels_8mm[3], slice_of_interest, offset_of_interest]
+    mm8 = V_MTRasym_reshaped_pc[43:48, 54:59, slice_of_interest, offset_of_interest]
     mm8_avg, mm8_sem = np.mean(mm8.reshape(-1)), sc.stats.sem(mm8.reshape(-1))
     print(mm8_avg)
     print(mm8_sem)
 
     print('10mM')
-    pixels_10mm = pixels_10mm
-    mm10 = V_MTRasym_reshaped_pc[pixels_10mm[0]:pixels_10mm[1],pixels_10mm[2]:pixels_10mm[3], slice_of_interest, offset_of_interest]
+    mm10 = V_MTRasym_reshaped_pc[47:52, 74:79, slice_of_interest, offset_of_interest]
     mm10_avg, mm10_sem = np.mean(mm10.reshape(-1)), sc.stats.sem(mm10.reshape(-1))
     print(mm10_avg)
     print(mm10_sem)
@@ -211,13 +201,63 @@ def EVAL_GluCEST(data_path, seq_path):
     plt.ylabel("MTRasym contrast [%]")
     plt.title("Linear trend with concentrations")
     plt.legend()
-    '''plt.grid(True)'''
-    plt.show()
+    plt.grid(True)
+    plt.show()'''
     
 
 if __name__ == "__main__":
-    globals()["EVAL_GluCEST"] = EVAL_GluCEST 
-    EVAL_GluCEST(
-        data_path=r'C:\asb\ntnu\MRIscans\250324\dicoms\E35', 
-        seq_path=r'C:\asb\ntnu\MRIscans\250324\seq_files\seq_file_E35.seq'
-    )
+
+    # 250317
+    '''#dcm_names = np.array(['12','13','14','15','16'])
+    #label_names = ['1uT', '2uT', '3uT', '4uT', '5uT']
+
+    #dcm_names = np.array(['22','24','14','23','25'])
+    #label_names = ['15ms', '30ms', '50ms', '100ms', '300ms']
+
+    dcm_names = np.array(['23','28','29','30','32','33','34'])
+    label_names = ['10e-5s', '1s', '2s', '3s', '4s', '6s', '10s']'''
+
+    # 250324
+    #dcm_names = np.array(['10','11','12','13','14','15'])
+    #label_names = ['10e-5s', '1s', '2s', '3s', '5s', '10s']
+
+    #dcm_names = np.array(['16','17','18','19','20']) 
+    #label_names = ['1uT', '2uT', '3uT', '4uT', '5uT'] 
+
+    #dcm_names = np.array(['21','22','23','24','25'])
+    #label_names = ['15ms', '30ms', '50ms', '100ms', '300ms']
+
+    dcm_names = np.array(['13','18','23','35'])
+    label_names = ['baseline 1', 'baseline 2', 'baseline 3', 'baseline 4']
+
+    plt.figure(figsize=(10, 4))
+    colors = plt.cm.rainbow(np.linspace(0, 1, len(dcm_names)))
+
+    print('Correct path for you acquisitions?\n')
+    for i in range(len(dcm_names)):
+        print(f'Loop: {i+1}')
+        data_path = str(r'C:\asb\ntnu\MRIscans\250324\dicoms\E') + dcm_names[i]
+        seq_path = str(r'C:\asb\ntnu\MRIscans\250324\seq_files\seq_file_E') + dcm_names[i] + str('.seq')
+        w, Z_spectrum, MTR_spectrum = EVAL_GluCEST(data_path, seq_path)
+
+        plt.subplot(1, 2, 1)
+        plt.plot(w, Z_spectrum, marker='o', markersize=2, label=label_names[i], color=colors[i])
+        plt.xlim([-5, 5])
+        plt.ylim([0.2,1.1])
+        plt.xlabel('Frequency offset [ppm]')
+        plt.ylabel('Normalized MTR')
+        plt.gca().invert_xaxis()
+        plt.title("Z-spectrums in 10 mM")
+        plt.legend()
+
+        plt.subplot(1, 2, 2)
+        plt.plot(w, MTR_spectrum, marker='o', markersize=2, label=label_names[i], color=colors[i])
+        plt.xlim([0, 4])
+        plt.ylim([-0.05,0.3])
+        plt.xlabel('Frequency offset [ppm]')
+        plt.ylabel('MTRasym [%]')
+        plt.gca().invert_xaxis()
+        plt.title("MTRasym-spectrums in 10 mM")
+        plt.legend()
+
+    plt.show()
