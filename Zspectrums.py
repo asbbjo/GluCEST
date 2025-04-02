@@ -101,10 +101,10 @@ def EVAL_GluCEST(data_path, seq_path):
     w_offset_of_interest = offsets[offset_of_interest]
 
     # Spectrum handling phantom
-    pixels_10mm = [43,48,75,80] # 250317
-    if data_path[-2:] == "14":
-        pixels_10mm = [47,52,74,79] # 250312
-    #pixels_10mm = [47,52,74,79] # 250312
+    #pixels_10mm = [43,48,75,80] # 250317
+    #if data_path[-2:] == "14":
+    #    pixels_10mm = [47,52,74,79] # 250312
+    pixels_10mm = [47,52,74,79] # 250312
     #pixels_10mm = [43,48,75,80] # 250317
     #pixels_10mm = [54,59,42,47] # 250324
     array_Z = V_Z_corr_reshaped[pixels_10mm[0]:pixels_10mm[1],pixels_10mm[2]:pixels_10mm[3],0,1:]
@@ -128,12 +128,12 @@ if __name__ == "__main__":
     label_names = ['10e-5s', '1s', '2s', '3s', '4s', '6s', '10s']'''
 
     # 250313
-    '''dcm_names = np.array(['12','13','14','15','16'])
-    label_names = ['1uT', '2uT', '3uT', '4uT', '5uT']'''
+    dcm_names = np.array(['12','13','14','15','16'])
+    label_names = ['1uT', '2uT', '3uT', '4uT', '5uT']
 
     # 250317
-    dcm_names = np.array(['22','24','14','23','25'])
-    label_names = ['15ms', '30ms', '50ms', '100ms', '300ms']
+    '''dcm_names = np.array(['22','24','14','23','25'])
+    label_names = ['15ms', '30ms', '50ms', '100ms', '300ms']'''
 
     # 250324
     '''#dcm_names = np.array(['10','11','12','13','14','15'])
