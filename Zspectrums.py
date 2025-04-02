@@ -100,24 +100,13 @@ def EVAL_GluCEST(data_path, seq_path):
     offset_of_interest = np.where(offsets == desired_offset)[0]  
     w_offset_of_interest = offsets[offset_of_interest]
 
-    '''plt.figure(figsize=(10, 4))
-    plt.subplot(1, 2, 1)
-    vmin, vmax = 0.5, 1 # Z-spectra range
-    im = plt.imshow(V_Z_corr_reshaped[:,:,slice_of_interest,offset_of_interest], vmin=vmin, vmax=vmax, cmap='rainbow')
-    cb = plt.colorbar(im, format="%.2f")
-    cb.set_ticks(np.linspace(vmin, vmax, 5)) 
-    plt.title("Z(Δω) = %.2f ppm" % w_offset_of_interest)
-    plt.subplot(1, 2, 2)
-    vmin, vmax = -0.20, 0.20 # set GluCEST contrast range
-    im = plt.imshow(V_MTRasym_reshaped[:,:,slice_of_interest,offset_of_interest], vmin=vmin, vmax=vmax, cmap='rainbow')
-    cb = plt.colorbar(im, format="%.2f")
-    cb.set_ticks(np.linspace(vmin, vmax, 5)) 
-    plt.title("MTRasym(Δω) = %.2f ppm" % w_offset_of_interest)
-    plt.show()'''
-
     # Spectrum handling phantom
-    #pixels_10mm = [47,52,74,79] # 250317
-    pixels_10mm = [54,59,42,47] # 250324
+    pixels_10mm = [43,48,75,80] # 250317
+    if data_path[-2:] == "14":
+        pixels_10mm = [47,52,74,79] # 250312
+    #pixels_10mm = [47,52,74,79] # 250312
+    #pixels_10mm = [43,48,75,80] # 250317
+    #pixels_10mm = [54,59,42,47] # 250324
     array_Z = V_Z_corr_reshaped[pixels_10mm[0]:pixels_10mm[1],pixels_10mm[2]:pixels_10mm[3],0,1:]
     flattened_vectors_Z = array_Z.reshape(-1, array_Z.shape[-1]) 
     average_vector_Z = flattened_vectors_Z.mean(axis=0)
@@ -131,79 +120,6 @@ def EVAL_GluCEST(data_path, seq_path):
 
     return w, Z_spectrum, MTR_spectrum
     
-    '''plt.figure(figsize=(10, 4))
-    plt.subplot(1, 2, 1)
-    plt.plot(w, Z_spectrum, "r.-")
-    plt.gca().invert_xaxis()
-    plt.title("Mean Z-spectrum in 10 mM")
-    
-    plt.subplot(1, 2, 2)
-    plt.plot(w, MTR_spectrum, "b.-")
-    plt.xlim([0, 4])
-    plt.gca().invert_xaxis()
-    plt.title("Mean MTRasym-spectrum in 10 mM")
-    plt.show()
-
-    print('MTRasym contrast for each concentration:')
-    V_MTRasym_reshaped_pc = V_MTRasym_reshaped*100
-    print('0mM')
-    mm0 = V_MTRasym_reshaped_pc[66:71, 80:85, slice_of_interest, offset_of_interest]
-    mm0_avg, mm0_sem = np.mean(mm0.reshape(-1)), sc.stats.sem(mm0.reshape(-1))
-    print(mm0_avg)
-    print(mm0_sem)
-
-    print('2mM')
-    mm2 = V_MTRasym_reshaped_pc[81:86, 67:72, slice_of_interest, offset_of_interest]
-    mm2_avg, mm2_sem = np.mean(mm2.reshape(-1)), sc.stats.sem(mm2.reshape(-1))
-    print(mm2_avg)
-    print(mm2_sem)
-
-    print('4mM')
-    mm4 = V_MTRasym_reshaped_pc[76:81, 47:52, slice_of_interest, offset_of_interest]
-    mm4_avg, mm4_sem = np.mean(mm4.reshape(-1)), sc.stats.sem(mm4.reshape(-1))
-    print(mm4_avg)
-    print(mm4_sem)
-
-    print('6mM')
-    mm6 = V_MTRasym_reshaped_pc[57:62, 41:46, slice_of_interest, offset_of_interest]
-    mm6_avg, mm6_sem = np.mean(mm6.reshape(-1)), sc.stats.sem(mm6.reshape(-1))
-    print(mm6_avg)
-    print(mm6_sem)
-
-    print('8mM')
-    mm8 = V_MTRasym_reshaped_pc[43:48, 54:59, slice_of_interest, offset_of_interest]
-    mm8_avg, mm8_sem = np.mean(mm8.reshape(-1)), sc.stats.sem(mm8.reshape(-1))
-    print(mm8_avg)
-    print(mm8_sem)
-
-    print('10mM')
-    mm10 = V_MTRasym_reshaped_pc[47:52, 74:79, slice_of_interest, offset_of_interest]
-    mm10_avg, mm10_sem = np.mean(mm10.reshape(-1)), sc.stats.sem(mm10.reshape(-1))
-    print(mm10_avg)
-    print(mm10_sem)
-
-    mm = np.array([0,2,4,6,8,10])
-    mm_avg = np.array([mm0_avg, mm2_avg, mm4_avg, mm6_avg, mm8_avg, mm10_avg])
-    mm_sem = np.array([mm0_sem, mm2_sem, mm4_sem, mm6_sem, mm8_sem, mm10_sem])
-
-    # Plot data with error bars
-    plt.errorbar(mm, mm_avg, yerr=mm_sem, fmt='o', label="Averages of data with SEM", capsize=6)
-
-    # Fit a linear trend line
-    slope, intercept = np.polyfit(mm, mm_avg, 1)  # Linear fit (degree=1)
-    trend_line = slope * mm + intercept  # Calculate trend line values
-
-    # Plot the trend line
-    plt.plot(mm, trend_line, 'r--', label=f"Trend: y={slope:.2f}x + {intercept:.2f}")
-
-    # Labels and legend
-    plt.xlabel("Concentration of Glu [mM]")
-    plt.ylabel("MTRasym contrast [%]")
-    plt.title("Linear trend with concentrations")
-    plt.legend()
-    plt.grid(True)
-    plt.show()'''
-    
 
 if __name__ == "__main__":
 
@@ -216,30 +132,30 @@ if __name__ == "__main__":
     label_names = ['1uT', '2uT', '3uT', '4uT', '5uT']'''
 
     # 250317
-    '''#dcm_names = np.array(['22','24','14','23','25'])
-    #label_names = ['15ms', '30ms', '50ms', '100ms', '300ms']'''
+    dcm_names = np.array(['22','24','14','23','25'])
+    label_names = ['15ms', '30ms', '50ms', '100ms', '300ms']
 
     # 250324
-    #dcm_names = np.array(['10','11','12','13','14','15'])
+    '''#dcm_names = np.array(['10','11','12','13','14','15'])
     #label_names = ['10e-5s', '1s', '2s', '3s', '5s', '10s']
 
-    dcm_names = np.array(['16','17','18','19','20']) 
-    label_names = ['1uT', '2uT', '3uT', '4uT', '5uT'] 
+    #dcm_names = np.array(['16','17','18','19','20']) 
+    #label_names = ['1uT', '2uT', '3uT', '4uT', '5uT'] 
 
     #dcm_names = np.array(['21','22','23','24','25'])
     #label_names = ['15ms', '30ms', '50ms', '100ms', '300ms']
 
     #dcm_names = np.array(['13','18','23','35'])
-    #label_names = ['baseline 1', 'baseline 2', 'baseline 3', 'baseline 4']
+    #label_names = ['baseline 1', 'baseline 2', 'baseline 3', 'baseline 4']'''
 
     plt.figure(figsize=(10, 4))
     colors = plt.cm.rainbow(np.linspace(0, 1, len(dcm_names)))
 
-    print('Correct path for you acquisitions?\n')
+    input('Correct path for you acquisitions?\n')
     for i in range(len(dcm_names)):
         print(f'Loop: {i+1}')
-        data_path = str(r'C:\asb\ntnu\MRIscans\250324\dicoms\E') + dcm_names[i]
-        seq_path = str(r'C:\asb\ntnu\MRIscans\250324\seq_files\seq_file_E') + dcm_names[i] + str('.seq')
+        data_path = str(r'C:\asb\ntnu\MRIscans\250317\dicoms\E') + dcm_names[i]
+        seq_path = str(r'C:\asb\ntnu\MRIscans\250317\seq_files\seq_file_E') + dcm_names[i] + str('.seq')
         w, Z_spectrum, MTR_spectrum = EVAL_GluCEST(data_path, seq_path)
 
         plt.subplot(1, 2, 1)
