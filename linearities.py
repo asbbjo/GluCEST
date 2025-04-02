@@ -117,33 +117,33 @@ def EVAL_GluCEST(data_path, seq_path):
 
     print('--- Statistical measurements ---')
     V_MTRasym_reshaped_pc = V_MTRasym_reshaped*100
-    #pixels_0mm = [66,71,80,85] # 250317
-    pixels_0mm = [40,45,56,61] # 250317
+    pixels_0mm = [66,71,80,85] # 250317
+    #pixels_0mm = [40,45,56,61] # 250324
     mm0 = V_MTRasym_reshaped_pc[pixels_0mm[0]:pixels_0mm[1],pixels_0mm[2]:pixels_0mm[3], slice_of_interest, offset_of_interest]
     mm0_avg, mm0_sem = np.mean(mm0.reshape(-1)), sc.stats.sem(mm0.reshape(-1))
 
-    #pixels_2mm = [81,86,67,72] # 250317
-    pixels_2mm = [44,49,75,80] # 250324
+    pixels_2mm = [81,86,67,72] # 250317
+    #pixels_2mm = [44,49,75,80] # 250324
     mm2 = V_MTRasym_reshaped_pc[pixels_2mm[0]:pixels_2mm[1],pixels_2mm[2]:pixels_2mm[3], slice_of_interest, offset_of_interest]
     mm2_avg, mm2_sem = np.mean(mm2.reshape(-1)), sc.stats.sem(mm2.reshape(-1))
 
-    #pixels_4mm = [76,81,47,52] # 250317
-    pixels_4mm = [62,67,81,86] # 250324
+    pixels_4mm = [76,81,47,52] # 250317
+    #pixels_4mm = [62,67,81,86] # 250324
     mm4 = V_MTRasym_reshaped_pc[pixels_4mm[0]:pixels_4mm[1],pixels_4mm[2]:pixels_4mm[3], slice_of_interest, offset_of_interest]
     mm4_avg, mm4_sem = np.mean(mm4.reshape(-1)), sc.stats.sem(mm4.reshape(-1))
 
-    #pixels_6mm = [57,62,41,46] # 250317
-    pixels_6mm = [77,82,67,72] # 250324
+    pixels_6mm = [57,62,41,46] # 250317
+    #pixels_6mm = [77,82,67,72] # 250324
     mm6 = V_MTRasym_reshaped_pc[pixels_6mm[0]:pixels_6mm[1],pixels_6mm[2]:pixels_6mm[3], slice_of_interest, offset_of_interest]
     mm6_avg, mm6_sem = np.mean(mm6.reshape(-1)), sc.stats.sem(mm6.reshape(-1))
 
-    #pixels_8mm = [43,48,54,59] # 250317
-    pixels_8mm = [72,77,48,53] # 250324
+    pixels_8mm = [43,48,54,59] # 250317
+    #pixels_8mm = [72,77,48,53] # 250324
     mm8 = V_MTRasym_reshaped_pc[pixels_8mm[0]:pixels_8mm[1],pixels_8mm[2]:pixels_8mm[3], slice_of_interest, offset_of_interest]
     mm8_avg, mm8_sem = np.mean(mm8.reshape(-1)), sc.stats.sem(mm8.reshape(-1))
 
-    # pixels_10mm = [47,52,74,79] # 250317
-    pixels_10mm = [54,59,42,47] # 250324
+    pixels_10mm = [47,52,74,79] # 250317
+    #pixels_10mm = [54,59,42,47] # 250324
     mm10 = V_MTRasym_reshaped_pc[pixels_10mm[0]:pixels_10mm[1],pixels_10mm[2]:pixels_10mm[3], slice_of_interest, offset_of_interest]
     mm10_avg, mm10_sem = np.mean(mm10.reshape(-1)), sc.stats.sem(mm10.reshape(-1))
 
@@ -231,17 +231,18 @@ def EVAL_GluCEST(data_path, seq_path):
 if __name__ == "__main__":
 
     # 250317
-    '''#dcm_names = np.array(['12','13','14','15','16'])
+    #dcm_names = np.array(['12','13','14','15','16'])
     #label_names = ['1uT', '2uT', '3uT', '4uT', '5uT']
 
     #dcm_names = np.array(['22','24','14','23','25'])
     #label_names = ['15ms', '30ms', '50ms', '100ms', '300ms']
 
     dcm_names = np.array(['23','28','29','30','32','33','34'])
-    label_names = ['10e-5s', '1s', '2s', '3s', '4s', '6s', '10s']'''
+    label_names = ['10e-5s', '1s', '2s', '3s', '4s', '6s', '10s']
+    title = str("Linear trends with recovery times")
 
     # 250324
-    dcm_names = np.array(['10','11','12','13','14','15'])
+    '''dcm_names = np.array(['10','11','12','13','14','15'])
     label_names = ['10e-5s', '1s', '2s', '3s', '5s', '10s']
     title = str("Linear trends with recovery times")
 
@@ -255,16 +256,16 @@ if __name__ == "__main__":
 
     #dcm_names = np.array(['13','18','23','35'])
     #label_names = ['baseline 1', 'baseline 2', 'baseline 3', 'baseline 4']
-    #title = str("Linear trends with baseline measurements")
+    #title = str("Linear trends with baseline measurements")'''
 
     plt.figure(figsize=(10, 4))
     colors = plt.cm.rainbow(np.linspace(0, 1, len(dcm_names)))
 
-    print('Correct path for you acquisitions?\n')
+    input('Correct path for you acquisitions?\n')
     for i in range(len(dcm_names)):
         print(f'Loop: {i+1}')
-        data_path = str(r'C:\asb\ntnu\MRIscans\250324\dicoms\E') + dcm_names[i]
-        seq_path = str(r'C:\asb\ntnu\MRIscans\250324\seq_files\seq_file_E') + dcm_names[i] + str('.seq')
+        data_path = str(r'C:\asb\ntnu\MRIscans\250312\dicoms\E') + dcm_names[i]
+        seq_path = str(r'C:\asb\ntnu\MRIscans\250312\seq_files\seq_file_E') + dcm_names[i] + str('.seq')
         mm, mm_avg, mm_sem = EVAL_GluCEST(data_path, seq_path)
 
         # Fit a linear trend line
@@ -287,6 +288,4 @@ if __name__ == "__main__":
         plt.title(title)
         '''plt.grid(True)'''
         plt.legend()
-
-
     plt.show()

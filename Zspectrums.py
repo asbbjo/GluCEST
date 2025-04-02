@@ -116,7 +116,7 @@ def EVAL_GluCEST(data_path, seq_path):
     plt.show()'''
 
     # Spectrum handling phantom
-    # pixels_10mm = [47,52,74,79] # 250317
+    #pixels_10mm = [47,52,74,79] # 250317
     pixels_10mm = [54,59,42,47] # 250324
     array_Z = V_Z_corr_reshaped[pixels_10mm[0]:pixels_10mm[1],pixels_10mm[2]:pixels_10mm[3],0,1:]
     flattened_vectors_Z = array_Z.reshape(-1, array_Z.shape[-1]) 
@@ -207,28 +207,30 @@ def EVAL_GluCEST(data_path, seq_path):
 
 if __name__ == "__main__":
 
-    # 250317
-    '''#dcm_names = np.array(['12','13','14','15','16'])
-    #label_names = ['1uT', '2uT', '3uT', '4uT', '5uT']
-
-    #dcm_names = np.array(['22','24','14','23','25'])
-    #label_names = ['15ms', '30ms', '50ms', '100ms', '300ms']
-
-    dcm_names = np.array(['23','28','29','30','32','33','34'])
+    # 250312
+    '''dcm_names = np.array(['23','28','29','30','32','33','34'])
     label_names = ['10e-5s', '1s', '2s', '3s', '4s', '6s', '10s']'''
+
+    # 250313
+    '''dcm_names = np.array(['12','13','14','15','16'])
+    label_names = ['1uT', '2uT', '3uT', '4uT', '5uT']'''
+
+    # 250317
+    '''#dcm_names = np.array(['22','24','14','23','25'])
+    #label_names = ['15ms', '30ms', '50ms', '100ms', '300ms']'''
 
     # 250324
     #dcm_names = np.array(['10','11','12','13','14','15'])
     #label_names = ['10e-5s', '1s', '2s', '3s', '5s', '10s']
 
-    #dcm_names = np.array(['16','17','18','19','20']) 
-    #label_names = ['1uT', '2uT', '3uT', '4uT', '5uT'] 
+    dcm_names = np.array(['16','17','18','19','20']) 
+    label_names = ['1uT', '2uT', '3uT', '4uT', '5uT'] 
 
     #dcm_names = np.array(['21','22','23','24','25'])
     #label_names = ['15ms', '30ms', '50ms', '100ms', '300ms']
 
-    dcm_names = np.array(['13','18','23','35'])
-    label_names = ['baseline 1', 'baseline 2', 'baseline 3', 'baseline 4']
+    #dcm_names = np.array(['13','18','23','35'])
+    #label_names = ['baseline 1', 'baseline 2', 'baseline 3', 'baseline 4']
 
     plt.figure(figsize=(10, 4))
     colors = plt.cm.rainbow(np.linspace(0, 1, len(dcm_names)))
@@ -243,7 +245,7 @@ if __name__ == "__main__":
         plt.subplot(1, 2, 1)
         plt.plot(w, Z_spectrum, marker='o', markersize=2, label=label_names[i], color=colors[i])
         plt.xlim([-5, 5])
-        plt.ylim([0.2,1.1])
+        plt.ylim([0.12,1.1])
         plt.xlabel('Frequency offset [ppm]')
         plt.ylabel('Normalized MTR')
         plt.gca().invert_xaxis()
