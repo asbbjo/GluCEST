@@ -150,12 +150,12 @@ if __name__ == "__main__":
     label_names = ['10e-5s', '1s', '2s', '3s', '4s', '6s', '10s']'''
 
     # 250313
-    dcm_names = np.array(['12','13','14','15','16'])
-    label_names = ['1uT', '2uT', '3uT', '4uT', '5uT']
+    '''dcm_names = np.array(['12','13','14','15','16'])
+    label_names = ['1uT', '2uT', '3uT', '4uT', '5uT']'''
 
     # 250317
-    '''dcm_names = np.array(['22','24','14','23','25'])
-    label_names = ['15ms', '30ms', '50ms', '100ms', '300ms']'''
+    dcm_names = np.array(['22','24','14','23','25'])
+    label_names = ['15ms', '30ms', '50ms', '100ms', '300ms']
 
     # 250324
     '''#dcm_names = np.array(['10','11','12','13','14','15'])
@@ -176,9 +176,9 @@ if __name__ == "__main__":
     input('Correct path for you acquisitions?\n')
     for i in range(len(dcm_names)):
         print(f'Loop: {i+1}')
-        data_path = str(r'C:\asb\ntnu\MRIscans\250313\dicoms\E') + dcm_names[i]
-        seq_path = str(r'C:\asb\ntnu\MRIscans\250313\seq_files\seq_file_E') + dcm_names[i] + str('.seq')
-        date = '250313'
+        data_path = str(r'C:\asb\ntnu\MRIscans\250317\dicoms\E') + dcm_names[i]
+        seq_path = str(r'C:\asb\ntnu\MRIscans\250317\seq_files\seq_file_E') + dcm_names[i] + str('.seq')
+        date = '250317'
         w, Z_spectrum, MTR_spectrum = EVAL_GluCEST(data_path, seq_path, date)
 
         plt.subplot(1, 2, 1)
