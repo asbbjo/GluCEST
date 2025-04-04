@@ -24,7 +24,7 @@ def ppval(p, x):
             result = result * x + p[i]
         return result
 
-def EVAL_GluCEST(data_path, seq_path):
+def EVAL_GluCEST(data_path, seq_path, date):
     import pypulseq as pp # the import over is not found
     seq = pp.Sequence()
     print('--- Reading the sequence protocol ---')
@@ -116,15 +116,43 @@ def EVAL_GluCEST(data_path, seq_path):
     plt.title("MTRasym(Δω) = %.2f ppm" % w_offset_of_interest)
     plt.show()
 
+    # Choose pixels for ROI
+    if date == '250312':
+        pixels_0mm = [66,71,80,85] # 250312
+        pixels_2mm = [81,86,67,72] # 250312
+        pixels_4mm = [76,81,47,52] # 250312
+        pixels_6mm = [57,62,41,46] # 250312
+        pixels_8mm = [43,48,54,59] # 250312
+        pixels_10mm = [47,52,74,79] # 250312
+    elif date == '250313':
+        pixels_0mm = [66,71,80,85] # 250313
+        pixels_2mm = [81,86,67,72] # 250313
+        pixels_4mm = [76,81,47,52] # 250313
+        pixels_6mm = [57,62,41,46] # 250313
+        pixels_8mm = [43,48,54,59] # 250313
+        pixels_10mm = [47,52,74,79] # 250313
+    elif date == '250317':
+        pixels_0mm = [62,67,81,86] # 250317
+        pixels_2mm = [77,82,68,73] # 250317
+        pixels_4mm = [72,77,49,54] # 250317
+        pixels_6mm = [54,59,42,47] # 250317
+        pixels_8mm = [40,45,56,61] # 250317
+        pixels_10mm = [43,48,75,80] # 250317
+    elif date == '250324':
+        pixels_0mm = [40,45,56,61] # 250324
+        pixels_2mm = [44,49,75,80] # 250324
+        pixels_4mm = [62,67,81,86] # 250324
+        pixels_6mm = [77,82,67,72] # 250324
+        pixels_8mm = [72,77,48,53] # 250324
+        pixels_10mm = [54,59,42,47] # 250324
+
     # Spectrum handling phantom
-    #pixels_10mm = [47,52,74,79] # 250312
-    #pixels_10mm = [43,48,75,80] # 250317
-    pixels_10mm = [54,59,42,47] # 250324
     array_Z = V_Z_corr_reshaped[pixels_10mm[0]:pixels_10mm[1],pixels_10mm[2]:pixels_10mm[3],0,1:]
     flattened_vectors_Z = array_Z.reshape(-1, array_Z.shape[-1]) 
     average_vector_Z = flattened_vectors_Z.mean(axis=0)
 
-    array_MTR = V_MTRasym_reshaped[pixels_10mm[0]:pixels_10mm[1],pixels_10mm[2]:pixels_10mm[3],0,1:]
+    V_MTRasym_reshaped_pc = V_MTRasym_reshaped*100
+    array_MTR = V_MTRasym_reshaped_pc[pixels_10mm[0]:pixels_10mm[1],pixels_10mm[2]:pixels_10mm[3],0,1:]
     flattened_vectors_MTR = array_MTR.reshape(-1, array_MTR.shape[-1]) 
     average_vector_MTR = flattened_vectors_MTR.mean(axis=0)
 
@@ -145,47 +173,31 @@ def EVAL_GluCEST(data_path, seq_path):
     plt.show()
 
     print('MTRasym contrast for each concentration:')
-    V_MTRasym_reshaped_pc = V_MTRasym_reshaped*100
-    print('0mM')
-    #pixels_0mm = [66,71,80,85] # 250312
-    #pixels_0mm = [62,67,81,86] # 250317
-    pixels_0mm = [40,45,56,61] # 250324
+    print('0mM')    
     mm0 = V_MTRasym_reshaped_pc[pixels_0mm[0]:pixels_0mm[1],pixels_0mm[2]:pixels_0mm[3], slice_of_interest, offset_of_interest]
     mm0_avg, mm0_sem = np.mean(mm0.reshape(-1)), sc.stats.sem(mm0.reshape(-1))
     print(mm0_avg)
     print(mm0_sem)
 
-    print('2mM')
-    #pixels_2mm = [81,86,67,72] # 250312
-    #pixels_2mm = [77,82,68,73] # 250317
-    pixels_2mm = [44,49,75,80] # 250324
+    print('2mM')   
     mm2 = V_MTRasym_reshaped_pc[pixels_2mm[0]:pixels_2mm[1],pixels_2mm[2]:pixels_2mm[3], slice_of_interest, offset_of_interest]
     mm2_avg, mm2_sem = np.mean(mm2.reshape(-1)), sc.stats.sem(mm2.reshape(-1))
     print(mm2_avg)
     print(mm2_sem)
 
-    print('4mM')
-    #pixels_4mm = [76,81,47,52] # 250312
-    #pixels_4mm = [72,77,49,54] # 250317
-    pixels_4mm = [62,67,81,86] # 250324
+    print('4mM')    
     mm4 = V_MTRasym_reshaped_pc[pixels_4mm[0]:pixels_4mm[1],pixels_4mm[2]:pixels_4mm[3], slice_of_interest, offset_of_interest]
     mm4_avg, mm4_sem = np.mean(mm4.reshape(-1)), sc.stats.sem(mm4.reshape(-1))
     print(mm4_avg)
     print(mm4_sem)
 
     print('6mM')
-    #pixels_6mm = [57,62,41,46] # 250312
-    #pixels_6mm = [54,59,42,47] # 250317
-    pixels_6mm = [77,82,67,72] # 250324
     mm6 = V_MTRasym_reshaped_pc[pixels_6mm[0]:pixels_6mm[1],pixels_6mm[2]:pixels_6mm[3], slice_of_interest, offset_of_interest]
     mm6_avg, mm6_sem = np.mean(mm6.reshape(-1)), sc.stats.sem(mm6.reshape(-1))
     print(mm6_avg)
     print(mm6_sem)
 
     print('8mM')
-    #pixels_8mm = [43,48,54,59] # 250312
-    #pixels_8mm = [40,45,56,61] # 250317
-    pixels_8mm = [72,77,48,53] # 250324
     mm8 = V_MTRasym_reshaped_pc[pixels_8mm[0]:pixels_8mm[1],pixels_8mm[2]:pixels_8mm[3], slice_of_interest, offset_of_interest]
     mm8_avg, mm8_sem = np.mean(mm8.reshape(-1)), sc.stats.sem(mm8.reshape(-1))
     print(mm8_avg)
@@ -224,6 +236,7 @@ def EVAL_GluCEST(data_path, seq_path):
 if __name__ == "__main__":
     globals()["EVAL_GluCEST"] = EVAL_GluCEST 
     EVAL_GluCEST(
-        data_path=r'C:\asb\ntnu\MRIscans\250324\dicoms\E23', 
-        seq_path=r'C:\asb\ntnu\MRIscans\250324\seq_files\seq_file_E23.seq'
+        data_path=r'C:\asb\ntnu\MRIscans\250324\dicoms\E19', 
+        seq_path=r'C:\asb\ntnu\MRIscans\250324\seq_files\seq_file_E19.seq',
+        date = '250324'
     )
