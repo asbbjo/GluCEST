@@ -159,6 +159,20 @@ def EVAL_GluCEST(data_path, seq_path, date):
         pixels_6mm = [56,66,50,60] # PBS water
         pixels_8mm = [37,46,64,74] # 250408 - one of 10mM
         pixels_10mm = [55,64,73,82] # 250408 - one of 10mM
+    elif date == '250408':
+        pixels_0mm = [0,2,0,2] # nan
+        pixels_2mm = [0,2,0,2] # nan
+        pixels_4mm = [0,2,0,2] # nan
+        pixels_6mm = [56,66,50,60] #
+        pixels_8mm = [37,46,64,74] # 
+        pixels_10mm = [79,84,52,57] # 250408 
+    elif date == '250409':
+        pixels_0mm = [0,2,0,2] # 250409
+        pixels_2mm = [0,2,0,2] # 250409
+        pixels_4mm = [0,2,0,2] # 250409
+        pixels_6mm = [0,2,0,2] # 250409
+        pixels_8mm = [0,2,0,2] # 250409
+        pixels_10mm = [45,50,51,56] # 250409
 
 
     # Spectrum handling phantom
@@ -227,7 +241,7 @@ def EVAL_GluCEST(data_path, seq_path, date):
 if __name__ == "__main__":
     globals()["EVAL_GluCEST"] = EVAL_GluCEST 
     EVAL_GluCEST(
-        data_path=r'C:\asb\ntnu\MRIscans\250408_PBScheck\dicoms\E2', 
-        seq_path=r'C:\asb\ntnu\MRIscans\250408_PBScheck\seq_files\seq_file_E2.seq',
-        date = '250408_PBScheck'
+        data_path=r'C:\asb\ntnu\MRIscans\250409\dicoms\E4', 
+        seq_path=r'C:\asb\ntnu\MRIscans\250409\seq_files\seq_file_E4.seq',
+        date = '250409'
     )
