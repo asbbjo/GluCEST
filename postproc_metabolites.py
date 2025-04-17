@@ -118,12 +118,12 @@ def EVAL_GluCEST(data_path, seq_path):
 
     # Choose pixels for ROI
     pixels_dict = { 
-        'glu': [45,50,51,56],     # 250409
-        'gln': [43,48,70,75],     # 250409
-        'gaba': [59,64,82,87],    # 250409
-        'naa': [77,82,73,78],     # 250409
-        'cr': [79,84,54,59],      # 250409
-        'taurine': [63,68,43,48], # 250409
+        'glu': [45,50,51,56],     # 250409 & 250410
+        'gln': [43,48,70,75],     # 250409 & 250410
+        'gaba': [59,64,82,87],    # 250409 & 250410
+        'naa': [77,82,73,78],     # 250409 & 250410
+        'cr': [79,84,54,59],      # 250409 & 250410
+        'taurine': [63,68,43,48], # 250409 & 250410
     }
 
     # Choose metabolites
@@ -186,6 +186,7 @@ def EVAL_GluCEST(data_path, seq_path):
     m_sem = np.array(m_sem)
 
     # Plot data with error bars
+    plt.figure(figsize=(9, 4))
     print('--- Plotting GluCEST effect ---')
     plt.errorbar(metabolites, m_avg, yerr=m_sem, fmt='o', label="Average ± SEM", capsize=6)
     plt.xlabel("Metabolites")
@@ -200,6 +201,6 @@ def EVAL_GluCEST(data_path, seq_path):
 if __name__ == "__main__":
     globals()["EVAL_GluCEST"] = EVAL_GluCEST 
     EVAL_GluCEST(
-        data_path=r'C:\asb\ntnu\MRIscans\250409\dicoms\E10', 
-        seq_path=r'C:\asb\ntnu\MRIscans\250409\seq_files\seq_file_E10.seq',
+        data_path=r'C:\asb\ntnu\MRIscans\250410\dicoms\E24', 
+        seq_path=r'C:\asb\ntnu\MRIscans\250410\seq_files\seq_file_E24.seq',
     )
