@@ -65,7 +65,7 @@ def EVAL_GluCEST(data_path, seq_path):
     print('--- B0 correction of data ---')
     Z_corr = np.zeros_like(Z)
     w = offsets
-    dB0_stack = np.zeros(Z.shape[1]) # could be changes for wasabi
+    dB0_stack = np.zeros(Z.shape[1])
     for ii in range(Z.shape[1]):
         if np.all(np.isfinite(Z[:, ii])):
             pp = csaps(w, Z[:, ii], smooth=0.95)

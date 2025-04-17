@@ -65,7 +65,7 @@ def EVAL_GluCEST(data_path, seq_path):
     print('--- B0 correction of data ---')
     Z_corr = np.zeros_like(Z)
     w = offsets
-    dB0_stack = np.zeros(Z.shape[1]) # could be changes for wasabi
+    dB0_stack = np.zeros(Z.shape[1]) 
     for ii in range(Z.shape[1]):
         if np.all(np.isfinite(Z[:, ii])):
             pp = csaps(w, Z[:, ii], smooth=0.95)
@@ -77,20 +77,43 @@ def EVAL_GluCEST(data_path, seq_path):
     
             Z_corr[:, ii] = ppval(pp, w + dB0_stack[ii])
 
+    # 1. Find unique positive values (ignore 0)
+    w_pos_unique = np.unique(np.abs(w[w != 0]))
+
+    # 2. Create symmetric offsets: negative and positive pairs
+    w_symm = np.sort(np.concatenate([-w_pos_unique, [0], w_pos_unique]))
+
+    # 3. Interpolate Z_corr onto this new symmetric grid
+    from scipy.interpolate import interp1d
+
+    Z_corr_symm = np.zeros((len(w_symm), Z_corr.shape[1]))
+
+    for i in range(Z_corr.shape[1]):
+        interp_func = interp1d(w, Z_corr[:, i], kind='linear', fill_value="extrapolate")
+        Z_corr_symm[:, i] = interp_func(w_symm)
+
     # calculation of MTRasym spectrum
-    Z_ref = Z_corr[::-1, :]
-    MTRasym = Z_ref - Z_corr
+    Z_ref = Z_corr_symm[::-1, :]
+    MTRasym = Z_ref - Z_corr_symm
+
+    # Interpolating back to old w
+    interp_back_func = interp1d(w_symm, Z_corr_symm, axis=0, kind='linear', fill_value='extrapolate')
+    Z_corr_symm_resampled = interp_back_func(w)  # shape [36, 16382]
+
+    interp_back_func_mtr = interp1d(w_symm, MTRasym, axis=0, kind='linear', fill_value='extrapolate')
+    MTRasym_resampled = interp_back_func_mtr(w)  # shape [36, 16382]
+
 
     # Vectorization Backwards
     if Z.shape[1] > 1:
         V_MTRasym = np.zeros((V_m_z.shape[0], V_m_z.shape[1]), dtype=float)
-        V_MTRasym[1:, mask_idx] = MTRasym
+        V_MTRasym[1:, mask_idx] = MTRasym_resampled        
         V_MTRasym_reshaped = V_MTRasym.reshape(
             V.shape[3], V.shape[0], V.shape[1], V.shape[2]
         ).transpose(1, 2, 3, 0)
     
         V_Z_corr = np.zeros((V_m_z.shape[0], V_m_z.shape[1]), dtype=float)
-        V_Z_corr[1:, mask_idx] = Z_corr
+        V_Z_corr[1:, mask_idx] = Z_corr_symm_resampled
         V_Z_corr_reshaped = V_Z_corr.reshape(
             V.shape[3], V.shape[0], V.shape[1], V.shape[2]
         ).transpose(1, 2, 3, 0)
@@ -118,13 +141,15 @@ def EVAL_GluCEST(data_path, seq_path):
 
     # Choose pixels for ROI
     pixels_dict = { 
-        'glu': [45,50,51,56],     # 250409 & 250410
-        'gln': [43,48,70,75],     # 250409 & 250410
-        'gaba': [59,64,82,87],    # 250409 & 250410
-        'naa': [77,82,73,78],     # 250409 & 250410
-        'cr': [79,84,54,59],      # 250409 & 250410
-        'taurine': [63,68,43,48], # 250409 & 250410
+        'glu': [45,50,51,56],     # 250409 
+        'gln': [43,48,70,75],     # 250409
+        'gaba': [59,64,82,87],    # 250409 
+        'naa': [77,82,73,78],     # 250409
+        'cr': [79,84,54,59],      # 250409 
+        'taurine': [63,68,43,48], # 250409 
     }
+
+    input('Change the pixels ROI for 250410')
 
     # Choose metabolites
     label_names = ['Glu', 'Gln', 'GABA', 'NAA', 'Cr', 'Taurine']
@@ -201,6 +226,6 @@ def EVAL_GluCEST(data_path, seq_path):
 if __name__ == "__main__":
     globals()["EVAL_GluCEST"] = EVAL_GluCEST 
     EVAL_GluCEST(
-        data_path=r'C:\asb\ntnu\MRIscans\250410\dicoms\E24', 
-        seq_path=r'C:\asb\ntnu\MRIscans\250410\seq_files\seq_file_E24.seq',
+        data_path=r'C:\asb\ntnu\MRIscans\250410\dicoms\E7', 
+        seq_path=r'C:\asb\ntnu\MRIscans\250410\seq_files\seq_file_E7.seq',
     )
