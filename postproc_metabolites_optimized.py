@@ -140,7 +140,7 @@ def EVAL_GluCEST(data_path, seq_path):
     plt.show()
 
     # Choose pixels for ROI
-    pixels_dict = { 
+    pixels_dict_x = { 
         'glu': [45,50,51,56],     # 250409 
         'gln': [43,48,70,75],     # 250409
         'gaba': [59,64,82,87],    # 250409 
@@ -149,7 +149,14 @@ def EVAL_GluCEST(data_path, seq_path):
         'taurine': [63,68,43,48], # 250409 
     }
 
-    input('Change the pixels ROI for 250410')
+    pixels_dict = { 
+        'glu': [44,49,54,59],     # 250410
+        'gln': [42,47,73,78],     # 250410
+        'gaba': [59,64,86,91],    # 250410 
+        'naa': [76,81,77,82],     # 250410
+        'cr': [78,83,58,63],      # 250410 
+        'taurine': [63,68,47,52], # 250410 
+    }
 
     # Choose metabolites
     label_names = ['Glu', 'Gln', 'GABA', 'NAA', 'Cr', 'Taurine']
@@ -224,6 +231,7 @@ def EVAL_GluCEST(data_path, seq_path):
     
 
 if __name__ == "__main__":
+    input('Correct ROI for the acquisition date?')
     globals()["EVAL_GluCEST"] = EVAL_GluCEST 
     EVAL_GluCEST(
         data_path=r'C:\asb\ntnu\MRIscans\250410\dicoms\E7', 
