@@ -13,6 +13,21 @@ import scipy as sc
 # Run with pypulseq==1.4.2 and pydicom==3.0.1
 # Make sure to have Grassroots DICOM (pip install gdcm) and pylibjpeg (pip install pylibjpeg pylibjpeg-libjpeg)
 
+# Set general IEEE-style parameters
+plt.rcParams.update({
+    "text.usetex": False,  # Set to True if you have LaTeX installed
+    "font.family": "serif",
+    "font.size": 8,  # IEEE column text is usually around 8-9 pt
+    "axes.labelsize": 8,
+    "axes.titlesize": 8,
+    "legend.fontsize": 7,
+    "xtick.labelsize": 7,
+    "ytick.labelsize": 7,
+    "lines.linewidth": 1,
+    "lines.markersize": 4,
+    "figure.dpi": 300,
+})
+
 def ppval(p, x):
     # helper function to evaluate piecewise polinomial
     if callable(p):
