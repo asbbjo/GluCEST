@@ -92,130 +92,128 @@ def EVAL_GluCEST(data_path, seq_path):
     
             Z_corr[:, ii] = ppval(pp, w + dB0_stack[ii])
 
+    # 1. Find unique positive values (ignore 0)
+    w_pos_unique = np.unique(np.abs(w[w != 0]))
+
+    # 2. Create symmetric offsets: negative and positive pairs
+    w_symm = np.sort(np.concatenate([-w_pos_unique, [0], w_pos_unique]))
+
+    # 3. Interpolate Z_corr onto this new symmetric grid
+    from scipy.interpolate import interp1d
+
+    Z_corr_symm = np.zeros((len(w_symm), Z_corr.shape[1]))
+
+    for i in range(Z_corr.shape[1]):
+        interp_func = interp1d(w, Z_corr[:, i], kind='linear', fill_value="extrapolate")
+        Z_corr_symm[:, i] = interp_func(w_symm)
+
     # calculation of MTRasym spectrum
-    Z_ref = Z_corr[::-1, :]
-    MTRasym = Z_ref - Z_corr
+    Z_ref = Z_corr_symm[::-1, :]
+    MTRasym = Z_ref - Z_corr_symm
+
+    # Interpolating back to old w
+    interp_back_func = interp1d(w_symm, Z_corr_symm, axis=0, kind='linear', fill_value='extrapolate')
+    Z_corr_symm_resampled = interp_back_func(w)  # shape [36, 16382]
+
+    interp_back_func_mtr = interp1d(w_symm, MTRasym, axis=0, kind='linear', fill_value='extrapolate')
+    MTRasym_resampled = interp_back_func_mtr(w)  # shape [36, 16382]
+
 
     # Vectorization Backwards
     if Z.shape[1] > 1:
         V_MTRasym = np.zeros((V_m_z.shape[0], V_m_z.shape[1]), dtype=float)
-        V_MTRasym[1:, mask_idx] = MTRasym
+        V_MTRasym[1:, mask_idx] = MTRasym_resampled        
         V_MTRasym_reshaped = V_MTRasym.reshape(
             V.shape[3], V.shape[0], V.shape[1], V.shape[2]
         ).transpose(1, 2, 3, 0)
     
         V_Z_corr = np.zeros((V_m_z.shape[0], V_m_z.shape[1]), dtype=float)
-        V_Z_corr[1:, mask_idx] = Z_corr
+        V_Z_corr[1:, mask_idx] = Z_corr_symm_resampled
         V_Z_corr_reshaped = V_Z_corr.reshape(
             V.shape[3], V.shape[0], V.shape[1], V.shape[2]
         ).transpose(1, 2, 3, 0)
 
-    print('--- Plotting GluCEST images ---')
     slice_of_interest = 0 # pick slice for evaluation (0 if only one slice)
     desired_offset = 3 # pick offset for evaluation (3 for GluCEST at 3 ppm)
     offset_of_interest = np.where(offsets == desired_offset)[0]  
     w_offset_of_interest = offsets[offset_of_interest]
 
-    plt.figure(figsize=(10, 4))
-    plt.subplot(1, 2, 1)
-    vmin, vmax = 0.5, 1 # Z-spectra range
-    im = plt.imshow(V_Z_corr_reshaped[:,:,slice_of_interest,offset_of_interest], vmin=vmin, vmax=vmax, cmap='rainbow')
-    cb = plt.colorbar(im, format="%.2f")
-    cb.set_ticks(np.linspace(vmin, vmax, 5)) 
-    plt.title("Z(Δω) = %.2f ppm" % w_offset_of_interest)
-    plt.subplot(1, 2, 2)
-    vmin, vmax = -0.20, 0.20 # set GluCEST contrast range
-    im = plt.imshow(V_MTRasym_reshaped[:,:,slice_of_interest,offset_of_interest], vmin=vmin, vmax=vmax, cmap='rainbow')
-    cb = plt.colorbar(im, format="%.2f")
-    cb.set_ticks(np.linspace(vmin, vmax, 5)) 
-    plt.title("MTRasym(Δω) = %.2f ppm" % w_offset_of_interest)
-    plt.show()
 
     # Choose pixels for ROI
-    pixels_dict = { 
-        'glu': [45,50,51,56],     # 250409 & 10
-        'gln': [43,48,70,75],     # 250409 & 10
-        'gaba': [59,64,82,87],    # 250409 & 10
-        'naa': [77,82,73,78],     # 250409 & 10
-        'cr': [79,84,54,59],      # 250409 & 10
-        'taurine': [63,68,43,48], # 250409 & 10
+    pixels_dict = {            # 250409 & 250410
+        'glu': [44,49,54,59],    
+        'gln': [42,47,73,78],    
+        'gaba': [59,64,86,91],    
+        'naa': [76,81,77,82],     
+        'cr': [78,83,58,63],      
+        'taurine': [63,68,47,52], 
     }
 
     # Choose metabolites
     label_names = ['Glu', 'Gln', 'GABA', 'NAA', 'Cr', 'Taurine']
-    m_avg = []
-    m_sem = []
 
-    print('--- Plotting GluCEST spectra ---')
+    V_MTRasym_reshaped_pc = V_MTRasym_reshaped*100
+    mm_avg = []
+    mm_sem = []
+    print('--- Statistical measurements ---')
+    for i, label in enumerate(label_names):
+        key = label.lower()
+        pixels_metabolite = pixels_dict.get(key)        
+        mm = V_MTRasym_reshaped_pc[pixels_metabolite[0]:pixels_metabolite[1],pixels_metabolite[2]:pixels_metabolite[3], slice_of_interest, offset_of_interest]
+        avg, sem = np.mean(mm.reshape(-1)), sc.stats.sem(mm.reshape(-1))
+        mm_avg.append(avg)
+        mm_sem.append(sem)
+
+    return np.array(mm_avg), np.array(mm_sem)
+
+if __name__ == "__main__":
+
+    metabolites = ['Glu', 'Gln', 'GABA', 'NAA', 'Cr', 'Taurine']
+
+    # 250312
+    dcm_names = np.array(['9','14','18','7','22','26'])
+    label_names = ['10e-6s', '1s', '2s', '3s', '5s', '10s']
+    title = str("Linear trends with recovery times")
+
+    MTR_contrasts_avg = np.empty((6,6),dtype=float)
+    MTR_contrasts_sem = np.empty((6,6),dtype=float)
+
+    for i in range(len(dcm_names)):
+        print(f'Loop: {i+1}')
+        data_path = str(r'C:\asb\ntnu\MRIscans\250410\dicoms\E') + dcm_names[i]
+        seq_path = str(r'C:\asb\ntnu\MRIscans\250410\seq_files\seq_file_E') + dcm_names[i] + str('.seq')
+        mm_avg, mm_sem = EVAL_GluCEST(data_path, seq_path)
+
+        for j in range(len(mm_avg)):
+            MTR_contrasts_avg[j][i] = mm_avg[j]
+            MTR_contrasts_sem[j][i] = mm_sem[j]
+
+
+    mm = np.arange(0,6,1)
     plt.figure(figsize=(12, 4))
     colors = plt.cm.rainbow(np.linspace(0, 1, len(label_names)))
 
-    for i, label in enumerate(label_names):
-        key = label.lower()
-        pixels_metabolite = pixels_dict.get(key)
+    for i in range(len(MTR_contrasts_avg[0])):
+        # Fit a linear trend line
+        slope, intercept = np.polyfit(mm, MTR_contrasts_avg[i], 1)  # Linear fit (degree=1)
+        trend_line = slope * mm + intercept  # Calculate trend line values
 
-        # Spectrum handling phantom
-        array_Z = V_Z_corr_reshaped[pixels_metabolite[0]:pixels_metabolite[1],pixels_metabolite[2]:pixels_metabolite[3],slice_of_interest,1:] # 1: to remove the M0 scan
-        flattened_vectors_Z = array_Z.reshape(-1, array_Z.shape[-1]) 
-        Z_spectrum = flattened_vectors_Z.mean(axis=0)
+        # MSE
+        mse = np.mean((MTR_contrasts_avg[i] - trend_line) ** 2)
+        label_uT = str(metabolites[i]) + ":   MSE = " + str(round(mse,4))
+        
+        # Plot data with error bars
+        plt.errorbar(mm, MTR_contrasts_avg[i], yerr=MTR_contrasts_sem[i], fmt='o', label=label_uT, capsize=6, color=colors[i])
+        
+        # Plot the trend line
+        plt.plot(mm, trend_line,'--', color=colors[i])
 
-        V_MTRasym_reshaped_pc = V_MTRasym_reshaped*100
-        array_MTR = V_MTRasym_reshaped_pc[pixels_metabolite[0]:pixels_metabolite[1],pixels_metabolite[2]:pixels_metabolite[3],slice_of_interest,1:] # 1: to remove the M0 scan
-        flattened_vectors_MTR = array_MTR.reshape(-1, array_MTR.shape[-1]) 
-        MTR_spectrum = flattened_vectors_MTR.mean(axis=0)
-
-        # Get statistics
-        m_roi = V_MTRasym_reshaped_pc[pixels_metabolite[0]:pixels_metabolite[1],pixels_metabolite[2]:pixels_metabolite[3], slice_of_interest, offset_of_interest]
-        avg, sem = np.mean(m_roi.reshape(-1)), sc.stats.sem(m_roi.reshape(-1))
-        m_avg.append(avg)
-        m_sem.append(sem)
-
-        plt.subplot(1, 2, 1)
-        plt.plot(w, Z_spectrum, marker='o', markersize=2, label=label_names[i], color=colors[i])
-        plt.axvline(x=3, color='grey', linestyle='--', linewidth=0.8, alpha=0.7)
-        plt.xlim([-5, 5])
-        plt.ylim([0.12,1.1])
-        plt.xlabel('Frequency offset [ppm]')
-        plt.ylabel('Normalized MTR')
-        plt.gca().invert_xaxis()
-        plt.title("Z-spectra")
+        # Labels and legend
+        plt.xlabel("Recovery times")
+        plt.ylabel("MTRasym contrast [%]")
+        plt.title(title)
+        plt.xticks(mm, label_names)
+        '''plt.grid(True)'''
         plt.legend()
 
-        plt.subplot(1, 2, 2)
-        plt.plot(w, MTR_spectrum, marker='o', markersize=2, label=label_names[i], color=colors[i])
-        plt.axvline(x=3, color='grey', linestyle='--', linewidth=0.8, alpha=0.7)
-        plt.xlim([0, 4])
-        plt.ylim([-0.05,30])
-        plt.xlabel('Frequency offset [ppm]')
-        plt.ylabel('MTRasym [%]')
-        plt.gca().invert_xaxis()
-        plt.title("MTRasym-spectra")
-        plt.legend()
-
-    plt.plot
     plt.show()
-
-    # GluCEST effect for each [Glu]
-    metabolites = np.arange(len(label_names))
-    m_avg = np.array(m_avg)
-    m_sem = np.array(m_sem)
-
-    # Plot data with error bars
-    plt.figure(figsize=(9, 4))
-    print('--- Plotting GluCEST effect ---')
-    plt.errorbar(metabolites, m_avg, yerr=m_sem, fmt='o', label="Average ± SEM", capsize=6)
-    plt.xlabel("Metabolites")
-    plt.ylabel("MTRasym contrast [%]")
-    plt.title("GluCEST effect for metabolites")
-    plt.xticks(metabolites, label_names)
-    plt.legend()
-    plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
-    plt.show()
-    
-
-if __name__ == "__main__":
-    globals()["EVAL_GluCEST"] = EVAL_GluCEST 
-    EVAL_GluCEST(
-        data_path=r'C:\asb\ntnu\MRIscans\250410\dicoms\E20', 
-        seq_path=r'C:\asb\ntnu\MRIscans\250410\seq_files\seq_file_E20.seq',
-    )

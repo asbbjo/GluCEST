@@ -25,7 +25,7 @@ plt.rcParams.update({
     "ytick.labelsize": 7,
     "lines.linewidth": 1,
     "lines.markersize": 4,
-    "figure.dpi": 300,
+    "figure.dpi": 200,
 })
 
 def ppval(p, x):
@@ -155,15 +155,6 @@ def EVAL_GluCEST(data_path, seq_path):
     plt.show()
 
     # Choose pixels for ROI
-    pixels_dict_x_dont_use = { 
-        'glu': [45,50,51,56],     # 250409
-        'gln': [43,48,70,75],     # 250409
-        'gaba': [59,64,82,87],    # 250409 
-        'naa': [77,82,73,78],     # 250409
-        'cr': [79,84,54,59],      # 250409 
-        'taurine': [63,68,43,48], # 250409 
-    }
-
     pixels_dict = {            # 250409 & 250410
         'glu': [44,49,54,59],    
         'gln': [42,47,73,78],    
@@ -246,9 +237,8 @@ def EVAL_GluCEST(data_path, seq_path):
     
 
 if __name__ == "__main__":
-    input('Correct ROI for the acquisition date?')
     globals()["EVAL_GluCEST"] = EVAL_GluCEST 
     EVAL_GluCEST(
-        data_path=r'C:\asb\ntnu\MRIscans\250409\dicoms\E13', 
-        seq_path=r'C:\asb\ntnu\MRIscans\250409\seq_files\seq_file_E13.seq',
+        data_path=r'C:\asb\ntnu\MRIscans\250410\dicoms\E7', 
+        seq_path=r'C:\asb\ntnu\MRIscans\250410\seq_files\seq_file_E7.seq',
     )
