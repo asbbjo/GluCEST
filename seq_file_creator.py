@@ -16,7 +16,7 @@ import pypulseq as pp
 from bmctool.utils.seq.write import write_seq
 
 # get id of generation file
-seqid = Path(__file__).stem + "3uT_50ms"
+seqid = Path(__file__).stem + "rat241114"
 
 # get folder of generation file
 folder = Path(__file__).parent
@@ -29,22 +29,23 @@ FLAG_POST_PREP_SPOIL = True  # add spoiler after preparation block?
 
 # sequence definitions
 defs: dict = {}
-defs["b1pa"] = 3  # B1 peak amplitude [µT] (b1rms calculated below)
+defs["b1pa"] = 3.5  # B1 peak amplitude [µT] (b1rms calculated below)
 defs["b1rms"] = defs["b1pa"]  # B1 RMS amplitude [µT]
 defs["b0"] = 7  # B0 [T]
-defs["n_pulses"] = 60  # number of pulses 
-defs["tp"] = 50e-3  # pulse duration [s]
+defs["n_pulses"] = 10  # number of pulses 
+defs["tp"] = 60e-3  # pulse duration [s]
 defs["td"] = 0.01e-3  # interpulse delay [s]
-defs["trec"] = 3  # recovery time [s]
-defs["trec_m0"] = 3  # recovery time before M0 [s]
+defs["trec"] = 10e-6  # recovery time [s]
+defs["trec_m0"] = 10e-6  # recovery time before M0 [s]
 defs["m0_offset"] = -100  # m0 offset [ppm]
-defs["offsets_ppm"] = np.array([
+'''defs["offsets_ppm"] = np.array([
     -100, -5, -4, -3.5, -3.25, -3, -2.75, -2.5, -2,
     -1.5, -1, -0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75, 1,
     1.5, 2, 2.5, 2.75, 2.875, 3, 3.125, 3.25, 3.375, 3.5,
-    3.65, 3.8, 4, 4.5, 5])
-'''defs["offsets_ppm"] = np.append(defs["m0_offset"],np.concatenate(
-    [np.arange(-5, 0, 0.2), np.arange(0, 5.2, 0.2)])) # offset vector [ppm])'''
+    3.65, 3.8, 4, 4.5, 5])'''
+defs["offsets_ppm"] = np.append(defs["m0_offset"],np.concatenate(
+    [np.arange(-5, 0, 0.2), np.arange(0.2, 5.2, 0.2)])) # offset vector [ppm])
+# with or without 0 ppm?
 
 
 defs["dcsat"] = (defs["tp"]) / (defs["tp"] + defs["td"])  # duty cycle

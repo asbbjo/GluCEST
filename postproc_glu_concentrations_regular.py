@@ -18,14 +18,14 @@ plt.rcParams.update({
     "text.usetex": False,  # Set to True if you have LaTeX installed
     "font.family": "serif",
     "font.size": 8,  # IEEE column text is usually around 8-9 pt
-    "axes.labelsize": 8,
-    "axes.titlesize": 8,
+    "axes.labelsize": 7,
+    "axes.titlesize": 7,
     "legend.fontsize": 7,
     "xtick.labelsize": 7,
     "ytick.labelsize": 7,
     "lines.linewidth": 1,
-    "lines.markersize": 4,
-    "figure.dpi": 300,
+    "lines.markersize": 3.5,
+    "figure.dpi": 150,
 })
 
 def ppval(p, x):
@@ -124,7 +124,7 @@ def EVAL_GluCEST(data_path, seq_path, date):
     cb.set_ticks(np.linspace(vmin, vmax, 5)) 
     plt.title("Z(Δω) = %.2f ppm" % w_offset_of_interest)
     plt.subplot(1, 2, 2)
-    vmin, vmax = -0.20, 0.20 # set GluCEST contrast range
+    vmin, vmax = -0.35, 0.35 # set GluCEST contrast range
     im = plt.imshow(V_MTRasym_reshaped[:,:,slice_of_interest,offset_of_interest], vmin=vmin, vmax=vmax, cmap='rainbow')
     cb = plt.colorbar(im, format="%.2f")
     cb.set_ticks(np.linspace(vmin, vmax, 5)) 
@@ -187,7 +187,7 @@ def EVAL_GluCEST(data_path, seq_path, date):
         pixels_4mm = [0,2,0,2] # 250409
         pixels_6mm = [0,2,0,2] # 250409
         pixels_8mm = [0,2,0,2] # 250409
-        pixels_10mm = [45,50,51,56] # 250409
+        pixels_10mm = [41,42,32,33] # clincial scan
 
 
     # Spectrum handling phantom
@@ -256,7 +256,7 @@ def EVAL_GluCEST(data_path, seq_path, date):
 if __name__ == "__main__":
     globals()["EVAL_GluCEST"] = EVAL_GluCEST 
     EVAL_GluCEST(
-        data_path=r'C:\asb\ntnu\MRIscans\250409\dicoms\E4', 
-        seq_path=r'C:\asb\ntnu\MRIscans\250409\seq_files\seq_file_E4.seq',
-        date = '250409'
+        data_path=r'C:\asb\ntnu\MRIscans\250407\dicoms\E2', 
+        seq_path=r'C:\asb\ntnu\MRIscans\250407\seq_files\seq_file_E2.seq',
+        date = '250407'
     )
