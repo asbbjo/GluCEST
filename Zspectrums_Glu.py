@@ -17,10 +17,10 @@ import scipy as sc
 plt.rcParams.update({
     "text.usetex": False,  # Set to True if you have LaTeX installed
     "font.family": "serif",
-    "font.size": 8,  # IEEE column text is usually around 8-9 pt
-    "axes.labelsize": 7,
-    "axes.titlesize": 7,
-    "legend.fontsize": 7,
+    "font.size": 14,  # IEEE column text is usually around 8-9 pt
+    "axes.labelsize": 9,
+    "axes.titlesize": 12,
+    "legend.fontsize": 8,
     "xtick.labelsize": 7,
     "ytick.labelsize": 7,
     "lines.linewidth": 1,
@@ -137,6 +137,8 @@ def EVAL_GluCEST(data_path, seq_path, date):
         pixels_6mm = [54,59,42,47] # 250317
         pixels_8mm = [40,45,56,61] # 250317
         pixels_10mm = [43,48,75,80] # 250317
+        if data_path[-2:] == "14":
+            pixels_10mm = [47,52,74,79] # 250312 Fix for E14 baseline'''
     elif date == '250324':
         pixels_0mm = [40,45,56,61] # 250324
         pixels_2mm = [44,49,75,80] # 250324
@@ -162,7 +164,7 @@ if __name__ == "__main__":
 
     # 250312
     '''dcm_names = np.array(['23','28','29','30','32','33','34'])
-    label_names = ['10e-5s', '1s', '2s', '3s', '4s', '6s', '10s']'''
+    label_names = ['10e-6s', '1s', '2s', '3s', '4s', '6s', '10s']'''
 
     # 250313
     '''dcm_names = np.array(['12','13','14','15','16'])
@@ -170,7 +172,7 @@ if __name__ == "__main__":
 
     # 250317
     dcm_names = np.array(['22','24','14','23','25'])
-    label_names = ['15ms', '30ms', '50ms', '100ms', '300ms']
+    label_names = ['15ms', '30ms', '50ms', '100ms', '300ms'] # Fix right ROI for E14'''
 
     # 250324
     '''#dcm_names = np.array(['10','11','12','13','14','15'])

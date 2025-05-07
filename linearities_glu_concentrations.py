@@ -17,15 +17,15 @@ import scipy as sc
 plt.rcParams.update({
     "text.usetex": False,  # Set to True if you have LaTeX installed
     "font.family": "serif",
-    "font.size": 8,  # IEEE column text is usually around 8-9 pt
-    "axes.labelsize": 8,
-    "axes.titlesize": 8,
-    "legend.fontsize": 7,
+    "font.size": 15,  # IEEE column text is usually around 8-9 pt
+    "axes.labelsize": 9,
+    "axes.titlesize": 12,
+    "legend.fontsize": 8,
     "xtick.labelsize": 7,
     "ytick.labelsize": 7,
     "lines.linewidth": 1,
     "lines.markersize": 4,
-    "figure.dpi": 300,
+    "figure.dpi": 250,
 })
 
 def ppval(p, x):
@@ -137,6 +137,8 @@ def EVAL_GluCEST(data_path, seq_path, date):
         pixels_6mm = [54,59,42,47] # 250317
         pixels_8mm = [40,45,56,61] # 250317
         pixels_10mm = [43,48,75,80] # 250317
+        if data_path[-2:] == "14":
+            pixels_10mm = [47,52,74,79] # 250312 Fix for E14 baseline'''
     elif date == '250324':
         pixels_0mm = [40,45,56,61] # 250324
         pixels_2mm = [44,49,75,80] # 250324
@@ -176,9 +178,9 @@ def EVAL_GluCEST(data_path, seq_path, date):
 if __name__ == "__main__":
 
     # 250312
-    dcm_names = np.array(['23','28','29','30','32','33','34'])
-    label_names = ['10e-5s', '1s', '2s', '3s', '4s', '6s', '10s']
-    title = str("Linear trends with recovery times")
+    '''dcm_names = np.array(['23','28','29','30','32','33','34'])
+    label_names = ['10e-6s', '1s', '2s', '3s', '4s', '6s', '10s']
+    title = str("Linear trends with recovery times")'''
 
     # 250313
     '''dcm_names = np.array(['12','13','14','15','16'])
@@ -186,9 +188,9 @@ if __name__ == "__main__":
     title = str("Linear trends with pulse powers")'''
 
     # 250317
-    '''dcm_names = np.array(['22','24','14','23','25'])
-    label_names = ['15ms', '30ms', '50ms', '100ms', '300ms']
-    title = str("Linear trends with pulse lengths")'''
+    dcm_names = np.array(['22','24','14','23','25'])
+    label_names = ['15ms', '30ms', '50ms', '100ms', '300ms'] # Fix right ROI for E14
+    title = str("Linear trends with pulse lengths")
 
     # 250324
     '''dcm_names = np.array(['10','11','12','13','14','15'])
@@ -210,13 +212,13 @@ if __name__ == "__main__":
     plt.figure(figsize=(10, 4))
     colors = plt.cm.rainbow(np.linspace(0, 1, len(dcm_names)))
 
-    date = '250312'
+    date = '250317'
     print(date)
     input('Correct path for you acquisitions?\n')
     for i in range(len(dcm_names)):
         print(f'Loop: {i+1}')
-        data_path = str(r'C:\asb\ntnu\MRIscans\250312\dicoms\E') + dcm_names[i]
-        seq_path = str(r'C:\asb\ntnu\MRIscans\250312\seq_files\seq_file_E') + dcm_names[i] + str('.seq')
+        data_path = str(r'C:\asb\ntnu\MRIscans\250317\dicoms\E') + dcm_names[i]
+        seq_path = str(r'C:\asb\ntnu\MRIscans\250317\seq_files\seq_file_E') + dcm_names[i] + str('.seq')
         mm, mm_avg, mm_sem = EVAL_GluCEST(data_path, seq_path, date)
 
         # Fit a linear trend line
@@ -225,7 +227,7 @@ if __name__ == "__main__":
 
         # MSE
         mse = np.mean((mm_avg - trend_line) ** 2)
-        label_uT = str(label_names[i]) + ":   MSE = " + str(round(mse,4))
+        label_uT = str(label_names[i]) + ":   MSE = " + str(round(mse,3))
         
         # Plot data with error bars
         plt.errorbar(mm, mm_avg, yerr=mm_sem, fmt='o', label=label_uT, capsize=6, color=colors[i])
