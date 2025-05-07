@@ -13,6 +13,21 @@ import scipy as sc
 # Run with pypulseq==1.4.2 and pydicom==3.0.1
 # Make sure to have Grassroots DICOM (pip install gdcm) and pylibjpeg (pip install pylibjpeg pylibjpeg-libjpeg)
 
+# Set general IEEE-style parameters
+plt.rcParams.update({
+    "text.usetex": False,  # Set to True if you have LaTeX installed
+    "font.family": "serif",
+    "font.size": 8,  # IEEE column text is usually around 8-9 pt
+    "axes.labelsize": 7,
+    "axes.titlesize": 7,
+    "legend.fontsize": 7,
+    "xtick.labelsize": 7,
+    "ytick.labelsize": 7,
+    "lines.linewidth": 1,
+    "lines.markersize": 3.5,
+    "figure.dpi": 150,
+})
+
 def ppval(p, x):
     # helper function to evaluate piecewise polinomial
     if callable(p):
@@ -173,32 +188,35 @@ if __name__ == "__main__":
     plt.figure(figsize=(10, 4))
     colors = plt.cm.rainbow(np.linspace(0, 1, len(dcm_names)))
 
+    date = '250317'
+    print(date)
     input('Correct path for you acquisitions?\n')
     for i in range(len(dcm_names)):
         print(f'Loop: {i+1}')
         data_path = str(r'C:\asb\ntnu\MRIscans\250317\dicoms\E') + dcm_names[i]
         seq_path = str(r'C:\asb\ntnu\MRIscans\250317\seq_files\seq_file_E') + dcm_names[i] + str('.seq')
-        date = '250317'
         w, Z_spectrum, MTR_spectrum = EVAL_GluCEST(data_path, seq_path, date)
 
         plt.subplot(1, 2, 1)
         plt.plot(w, Z_spectrum, marker='o', markersize=2, label=label_names[i], color=colors[i])
         plt.xlim([-5, 5])
         plt.ylim([0.12,1.1])
+        plt.axvline(x=3, color='grey', linestyle='--', linewidth=0.8, alpha=0.7)
         plt.xlabel('Frequency offset [ppm]')
         plt.ylabel('Normalized MTR')
         plt.gca().invert_xaxis()
-        plt.title("Z-spectrums in 10 mM")
+        plt.title("Z-spectra in 10 mM Glu")
         plt.legend()
 
         plt.subplot(1, 2, 2)
         plt.plot(w, MTR_spectrum, marker='o', markersize=2, label=label_names[i], color=colors[i])
         plt.xlim([0, 4])
         plt.ylim([-0.05,0.3])
+        plt.axvline(x=3, color='grey', linestyle='--', linewidth=0.8, alpha=0.7)
         plt.xlabel('Frequency offset [ppm]')
         plt.ylabel('MTRasym [%]')
         plt.gca().invert_xaxis()
-        plt.title("MTRasym-spectrums in 10 mM")
+        plt.title("MTRasym-spectra in 10 mM Glu")
         plt.legend()
 
     plt.show()
