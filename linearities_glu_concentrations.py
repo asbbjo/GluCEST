@@ -138,7 +138,12 @@ def EVAL_GluCEST(data_path, seq_path, date):
         pixels_8mm = [40,45,56,61] # 250317
         pixels_10mm = [43,48,75,80] # 250317
         if data_path[-2:] == "14":
-            pixels_10mm = [47,52,74,79] # 250312 Fix for E14 baseline'''
+            pixels_0mm = [66,71,80,85] # 250312 ROI for E14 baseline
+            pixels_2mm = [81,86,67,72] # 250312
+            pixels_4mm = [76,81,47,52] # 250312
+            pixels_6mm = [57,62,41,46] # 250312
+            pixels_8mm = [43,48,54,59] # 250312
+            pixels_10mm = [47,52,74,79] # 250312 
     elif date == '250324':
         pixels_0mm = [40,45,56,61] # 250324
         pixels_2mm = [44,49,75,80] # 250324
@@ -189,7 +194,7 @@ if __name__ == "__main__":
 
     # 250317
     dcm_names = np.array(['22','24','14','23','25'])
-    label_names = ['15ms', '30ms', '50ms', '100ms', '300ms'] # Fix right ROI for E14
+    label_names = ['15ms', '30ms', '50ms', '100ms', '300ms'] # Different ROI for E14
     title = str("Linear trends with pulse lengths")
 
     # 250324
