@@ -168,15 +168,15 @@ def EVAL_GluCEST(data_path, seq_path, date):
 if __name__ == "__main__":
 
     # 250312
-    '''dcm_names = np.array(['23','28','29','30','32','33','34'])
-    label_names = ['10e-6s', '1s', '2s', '3s', '4s', '6s', '10s']'''
+    dcm_names = np.array(['23','28','29','30','32','33','34'])
+    label_names = ['10e-6s', '1s', '2s', '3s', '4s', '6s', '10s']
 
     # 250313
     '''dcm_names = np.array(['12','13','14','15','16'])
     label_names = ['1uT', '2uT', '3uT', '4uT', '5uT']'''
 
     # 250317
-    dcm_names = np.array(['22','24','14','23','25'])
+    '''dcm_names = np.array(['22','24','14','23','25'])
     label_names = ['15ms', '30ms', '50ms', '100ms', '300ms'] # Different ROI for E14'''
 
     # 250324
@@ -195,13 +195,13 @@ if __name__ == "__main__":
     plt.figure(figsize=(10, 4))
     colors = plt.cm.rainbow(np.linspace(0, 1, len(dcm_names)))
 
-    date = '250317'
+    date = '250312'
     print(date)
     input('Correct path for you acquisitions?\n')
     for i in range(len(dcm_names)):
         print(f'Loop: {i+1}')
-        data_path = str(r'C:\asb\ntnu\MRIscans\250317\dicoms\E') + dcm_names[i]
-        seq_path = str(r'C:\asb\ntnu\MRIscans\250317\seq_files\seq_file_E') + dcm_names[i] + str('.seq')
+        data_path = str(r'C:\asb\ntnu\MRIscans\250312\dicoms\E') + dcm_names[i]
+        seq_path = str(r'C:\asb\ntnu\MRIscans\250312\seq_files\seq_file_E') + dcm_names[i] + str('.seq')
         w, Z_spectrum, MTR_spectrum = EVAL_GluCEST(data_path, seq_path, date)
 
         plt.subplot(1, 2, 1)
@@ -213,6 +213,7 @@ if __name__ == "__main__":
         plt.ylabel('Normalized MTR')
         plt.gca().invert_xaxis()
         plt.title("Z-spectra in 10 mM Glu")
+        plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
         plt.legend()
 
         plt.subplot(1, 2, 2)
@@ -224,6 +225,7 @@ if __name__ == "__main__":
         plt.ylabel('MTRasym [%]')
         plt.gca().invert_xaxis()
         plt.title("MTRasym-spectra in 10 mM Glu")
+        plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
         plt.legend()
 
     plt.show()

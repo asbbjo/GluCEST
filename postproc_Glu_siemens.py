@@ -17,15 +17,15 @@ import scipy as sc
 plt.rcParams.update({
     "text.usetex": False,  # Set to True if you have LaTeX installed
     "font.family": "serif",
-    "font.size": 8,  # IEEE column text is usually around 8-9 pt
-    "axes.labelsize": 7,
-    "axes.titlesize": 7,
-    "legend.fontsize": 7,
-    "xtick.labelsize": 5,
-    "ytick.labelsize": 5,
+    "font.size": 14,  # IEEE column text is usually around 8-9 pt
+    "axes.labelsize": 9,
+    "axes.titlesize": 12,
+    "legend.fontsize": 8,
+    "xtick.labelsize": 7,
+    "ytick.labelsize": 7,
     "lines.linewidth": 1,
     "lines.markersize": 3.5,
-    "figure.dpi": 250,
+    "figure.dpi": 150,
 })
 
 def ppval(p, x):
@@ -175,15 +175,26 @@ def EVAL_GluCEST(data_path, seq_path, date):
     
     plt.figure(figsize=(10, 4))
     plt.subplot(1, 2, 1)
+    plt.axvline(x=3, color='grey', linestyle='--', linewidth=0.8, alpha=0.7)
+    plt.ylim([0.62, 1.02])
+    plt.xlim([-5.2, 5.2])
     plt.plot(w, Z_spectrum, "r.-")
+    plt.xlabel('Frequency offset [ppm]')
+    plt.ylabel('Normalized MTR')
     plt.gca().invert_xaxis()
+    plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
     plt.title("Mean Z-spectrum for 10mM")
     
     plt.subplot(1, 2, 2)
     plt.plot(w, MTR_spectrum, "b.-")
+    plt.axvline(x=3, color='grey', linestyle='--', linewidth=0.8, alpha=0.7)
     plt.xlim([0, 4])
+    plt.ylim([-0.05,18])
+    plt.xlabel('Frequency offset [ppm]')
+    plt.ylabel('MTRasym [%]')
     plt.gca().invert_xaxis()
     plt.title("Mean MTRasym-spectrum for 10mM")
+    plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
     plt.show()
 
     # GluCEST effect for each [Glu]
@@ -222,7 +233,7 @@ def EVAL_GluCEST(data_path, seq_path, date):
     plt.ylabel("MTRasym contrast [%]")
     plt.title("Linear trend with concentrations")
     plt.legend()
-    '''plt.grid(True)'''
+    plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
     plt.show()
     
 

@@ -17,15 +17,15 @@ import scipy as sc
 plt.rcParams.update({
     "text.usetex": False,  # Set to True if you have LaTeX installed
     "font.family": "serif",
-    "font.size": 8,  # IEEE column text is usually around 8-9 pt
-    "axes.labelsize": 8,
-    "axes.titlesize": 8,
-    "legend.fontsize": 7,
+    "font.size": 15,  # IEEE column text is usually around 8-9 pt
+    "axes.labelsize": 9,
+    "axes.titlesize": 12,
+    "legend.fontsize": 8,
     "xtick.labelsize": 7,
     "ytick.labelsize": 7,
     "lines.linewidth": 1,
     "lines.markersize": 4,
-    "figure.dpi": 300,
+    "figure.dpi": 200,
 })
 
 def ppval(p, x):
@@ -166,7 +166,7 @@ if __name__ == "__main__":
             MTR_contrasts_sem[j][i] = mm_sem[j]
 
 
-    mm = np.arange(0,6,1)
+    mm = np.array([0,1,2,3,5,10])
     plt.figure(figsize=(12, 4))
     colors = plt.cm.rainbow(np.linspace(0, 1, len(label_names)))
 
@@ -190,7 +190,7 @@ if __name__ == "__main__":
         plt.ylabel("MTRasym contrast [%]")
         plt.title(title)
         plt.xticks(mm, label_names)
-        '''plt.grid(True)'''
+        plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
         plt.legend()
 
     plt.show()
