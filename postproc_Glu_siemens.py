@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from scipy.interpolate import interp1d, UnivariateSpline
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 import matplotlib.pyplot as plt
 import numpy as np
 import pydicom
@@ -18,14 +19,14 @@ plt.rcParams.update({
     "text.usetex": False,  # Set to True if you have LaTeX installed
     "font.family": "serif",
     "font.size": 14,  # IEEE column text is usually around 8-9 pt
-    "axes.labelsize": 9,
-    "axes.titlesize": 12,
-    "legend.fontsize": 8,
+    "axes.labelsize": 8,
+    "axes.titlesize": 8,
+    "legend.fontsize": 7,
     "xtick.labelsize": 7,
     "ytick.labelsize": 7,
     "lines.linewidth": 1,
-    "lines.markersize": 3.5,
-    "figure.dpi": 150,
+    "lines.markersize": 4,
+    "figure.dpi": 300,
 })
 
 def ppval(p, x):
@@ -133,27 +134,6 @@ def EVAL_GluCEST(data_path, seq_path, date):
             V.shape[3], V.shape[0], V.shape[1], V.shape[2]
         ).transpose(1, 2, 3, 0)
 
-    print('--- Plotting ---')
-    slice_of_interest = 0 # pick slice for evaluation (0 if only one slice)
-    desired_offset = 3 # pick offset for evaluation (3 for GluCEST at 3 ppm)
-    offset_of_interest = np.where(offsets == desired_offset)[0]  
-    w_offset_of_interest = offsets[offset_of_interest]
-
-    plt.figure(figsize=(10, 4))
-    plt.subplot(1, 2, 1)
-    vmin, vmax = 0.5, 1 # Z-spectra range
-    im = plt.imshow(V_Z_corr_reshaped[:,:,slice_of_interest,offset_of_interest], vmin=vmin, vmax=vmax, cmap='rainbow')
-    cb = plt.colorbar(im, format="%.2f")
-    cb.set_ticks(np.linspace(vmin, vmax, 5)) 
-    plt.title("Z(Δω) = %.2f ppm" % w_offset_of_interest)
-    plt.subplot(1, 2, 2)
-    vmin, vmax = -0.20, 0.20 # set GluCEST contrast range
-    im = plt.imshow(V_MTRasym_reshaped[:,:,slice_of_interest,offset_of_interest], vmin=vmin, vmax=vmax, cmap='rainbow')
-    cb = plt.colorbar(im, format="%.2f")
-    cb.set_ticks(np.linspace(vmin, vmax, 5)) 
-    plt.title("MTRasym(Δω) = %.2f ppm" % w_offset_of_interest)
-    plt.show()
-
     # Choose pixels for ROI
     pixels_0mm = [389,393,201,205] 
     pixels_2mm = [390,394,218,222] 
@@ -172,29 +152,66 @@ def EVAL_GluCEST(data_path, seq_path, date):
     array_MTR = V_MTRasym_reshaped_pc[pixels_10mm[0]:pixels_10mm[1],pixels_10mm[2]:pixels_10mm[3],0,1:]
     flattened_vectors_MTR = array_MTR.reshape(-1, array_MTR.shape[-1]) 
     MTR_spectrum = flattened_vectors_MTR.mean(axis=0)
+
+    print('--- Plotting ---')
+    slice_of_interest = 0 # pick slice for evaluation (0 if only one slice)
+    desired_offset = 3 # pick offset for evaluation (3 for GluCEST at 3 ppm)
+    offset_of_interest = np.where(offsets == desired_offset)[0]  
+    w_offset_of_interest = offsets[offset_of_interest]
+
+    fig, ax = plt.subplots(figsize=(5, 5), constrained_layout=True) 
+    vmin, vmax = 0.5, 1  # Z-spectra range
+    im = ax.imshow(V_Z_corr_reshaped[:, :, slice_of_interest, offset_of_interest],vmin=vmin, vmax=vmax, cmap='rainbow')
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    cb = plt.colorbar(im, cax=cax, format="%.2f")
+    cb.set_ticks(np.linspace(vmin, vmax, 5)) 
+    ax.set_title("Z(Δω) = %.2f ppm" % w_offset_of_interest)
+    plt.show()
+
+    MTR_max = np.max(flattened_vectors_MTR)/100
+    fig, ax = plt.subplots(figsize=(5, 5), constrained_layout=True) 
+    vmin, vmax = 0, MTR_max # set GluCEST contrast range
+    im = ax.imshow(V_MTRasym_reshaped[:,:,slice_of_interest,offset_of_interest], vmin=vmin, vmax=vmax, cmap='OrRd')
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    cb = plt.colorbar(im, cax=cax, format="%.2f")
+    cb.set_ticks(np.linspace(vmin, vmax, 5)) 
+    ax.set_title("MTRasym(Δω) = %.2f ppm" % w_offset_of_interest)
+    plt.show()
     
-    plt.figure(figsize=(10, 4))
-    plt.subplot(1, 2, 1)
+    plt.figure(figsize=(5, 5), constrained_layout=True)
     plt.axvline(x=3, color='grey', linestyle='--', linewidth=0.8, alpha=0.7)
-    plt.ylim([0.62, 1.02])
-    plt.xlim([-5.2, 5.2])
+    plt.xlim([-5, 5])
+    plt.ylim([0.62,1.02])
     plt.plot(w, Z_spectrum, "r.-")
-    plt.xlabel('Frequency offset [ppm]')
+    plt.xlabel('Frequency offset Δω [ppm]')
     plt.ylabel('Normalized MTR')
     plt.gca().invert_xaxis()
     plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
     plt.title("Mean Z-spectrum for 10mM")
-    
-    plt.subplot(1, 2, 2)
+    # Make axes box square in screen units
+    xrange = 10       
+    yrange = 1.02 - 0.62
+    aspect_ratio = xrange / yrange
+    plt.gca().set_aspect(aspect_ratio, adjustable='box')
+    plt.show()
+
+    plt.figure(figsize=(5, 5), constrained_layout=True)
     plt.plot(w, MTR_spectrum, "b.-")
     plt.axvline(x=3, color='grey', linestyle='--', linewidth=0.8, alpha=0.7)
     plt.xlim([0, 4])
     plt.ylim([-0.05,18])
-    plt.xlabel('Frequency offset [ppm]')
+    plt.xlabel('Frequency offset Δω [ppm]')
     plt.ylabel('MTRasym [%]')
     plt.gca().invert_xaxis()
     plt.title("Mean MTRasym-spectrum for 10mM")
     plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
+    # Make axes box square in screen units
+    xrange = 4         
+    yrange = 18.05
+    aspect_ratio = xrange / yrange
+    plt.gca().set_aspect(aspect_ratio, adjustable='box')
     plt.show()
 
     # GluCEST effect for each [Glu]

@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from scipy.interpolate import interp1d, UnivariateSpline
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 import matplotlib.pyplot as plt
 import numpy as np
 import pydicom
@@ -133,34 +134,6 @@ def EVAL_GluCEST(data_path, seq_path):
             V.shape[3], V.shape[0], V.shape[1], V.shape[2]
         ).transpose(1, 2, 3, 0)
 
-    print('--- Plotting GluCEST images ---')
-    slice_of_interest = 0 # pick slice for evaluation (0 if only one slice)
-    desired_offset = 3 # pick offset for evaluation (3 for GluCEST at 3 ppm)
-    offset_of_interest = np.where(offsets == desired_offset)[0]  
-    w_offset_of_interest = offsets[offset_of_interest]
-
-    from mpl_toolkits.axes_grid1 import make_axes_locatable
-
-    fig, ax = plt.subplots(figsize=(5, 4)) 
-    vmin, vmax = 0.5, 1  # Z-spectra range
-    im = ax.imshow(V_Z_corr_reshaped[:, :, slice_of_interest, offset_of_interest],vmin=vmin, vmax=vmax, cmap='rainbow')
-    divider = make_axes_locatable(ax)
-    cax = divider.append_axes("right", size="5%", pad=0.05)
-    cb = plt.colorbar(im, cax=cax, format="%.2f")
-    cb.set_ticks(np.linspace(vmin, vmax, 5)) 
-    ax.set_title("Z(Δω) = %.2f ppm" % w_offset_of_interest)
-    plt.show()
-
-    fig, ax = plt.subplots(figsize=(5, 4)) 
-    vmin, vmax = 0, 0.10 # set GluCEST contrast range
-    im = ax.imshow(V_MTRasym_reshaped[:,:,slice_of_interest,offset_of_interest], vmin=vmin, vmax=vmax, cmap='OrRd')
-    divider = make_axes_locatable(ax)
-    cax = divider.append_axes("right", size="5%", pad=0.05)
-    cb = plt.colorbar(im, cax=cax, format="%.2f")
-    cb.set_ticks(np.linspace(vmin, vmax, 5)) 
-    ax.set_title("MTRasym(Δω) = %.2f ppm" % w_offset_of_interest)
-    plt.show()
-
     # Choose pixels for ROI
     pixels_dict = {            # 250409 & 250410
         'glu': [44,49,54,59],    
@@ -171,13 +144,44 @@ def EVAL_GluCEST(data_path, seq_path):
         'taurine': [63,68,47,52], 
     }
 
+    print('--- Plotting GluCEST images ---')
+    slice_of_interest = 0 # pick slice for evaluation (0 if only one slice)
+    desired_offset = 3 # pick offset for evaluation (3 for GluCEST at 3 ppm)
+    offset_of_interest = np.where(offsets == desired_offset)[0]  
+    w_offset_of_interest = offsets[offset_of_interest]
+
+    fig, ax = plt.subplots(figsize=(5, 5)) 
+    vmin, vmax = 0.5, 1  # Z-spectra range
+    im = ax.imshow(V_Z_corr_reshaped[:, :, slice_of_interest, offset_of_interest],vmin=vmin, vmax=vmax, cmap='rainbow')
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    cb = plt.colorbar(im, cax=cax, format="%.2f")
+    cb.set_ticks(np.linspace(vmin, vmax, 5)) 
+    ax.set_title("Z(Δω) = %.2f ppm" % w_offset_of_interest)
+    plt.show()
+
+    pixels_glu = pixels_dict.get('glu')
+    array_MTR = V_MTRasym_reshaped[pixels_glu[0]:pixels_glu[1],pixels_glu[2]:pixels_glu[3],slice_of_interest,1:] # 1: to remove the M0 scan
+    flattened_vectors_MTR_glu = array_MTR.reshape(-1, array_MTR.shape[-1]) 
+
+    MTR_max = np.max(flattened_vectors_MTR_glu)
+    fig, ax = plt.subplots(figsize=(5, 5)) 
+    vmin, vmax = 0, MTR_max # set GluCEST contrast range
+    im = ax.imshow(V_MTRasym_reshaped[:,:,slice_of_interest,offset_of_interest], vmin=vmin, vmax=vmax, cmap='OrRd')
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    cb = plt.colorbar(im, cax=cax, format="%.2f")
+    cb.set_ticks(np.linspace(vmin, vmax, 5)) 
+    ax.set_title("MTRasym(Δω) = %.2f ppm" % w_offset_of_interest)
+    plt.show()
+
     # Choose metabolites
     label_names = ['Glu', 'Gln', 'GABA', 'NAA', 'Cr', 'Taurine']
     m_avg = []
     m_sem = []
 
     print('--- Plotting GluCEST spectra ---')
-    plt.figure(figsize=(5, 4))
+    plt.figure(figsize=(5, 5))
     colors = plt.cm.rainbow(np.linspace(0, 1, len(label_names)))
 
     for i, label in enumerate(label_names):
@@ -196,20 +200,25 @@ def EVAL_GluCEST(data_path, seq_path):
         m_avg.append(avg)
         m_sem.append(sem)
 
-        plt.plot(w, Z_spectrum, marker='o', markersize=2, label=label_names[i], color=colors[i])
         plt.axvline(x=3, color='grey', linestyle='--', linewidth=0.8, alpha=0.7)
         plt.xlim([-5, 5])
         plt.ylim([0.12,1.1])
+        plt.plot(w, Z_spectrum, marker='o', markersize=2, label=label_names[i], color=colors[i])
         plt.xlabel('Frequency offset Δω [ppm]')
         plt.ylabel('Normalized MTR')
         plt.gca().invert_xaxis()
-        plt.title("Z-spectra for different metabolites")
         plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
-        plt.legend(loc='lower right')
+        plt.title("Z-spectra for different metabolites")
+        # Make axes box square in screen units
+        xrange = 10       
+        yrange = 1.1 - 0.12
+        aspect_ratio = xrange / yrange
+        plt.gca().set_aspect(aspect_ratio, adjustable='box')
 
+    plt.legend(loc='lower right')
     plt.show()
 
-    plt.figure(figsize=(5, 4))
+    plt.figure(figsize=(5, 5))
 
     for i, label in enumerate(label_names):
         key = label.lower()
@@ -230,17 +239,22 @@ def EVAL_GluCEST(data_path, seq_path):
         plt.gca().invert_xaxis()
         plt.title("MTRasym-spectra for different metabolites")
         plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
-        plt.legend(loc='upper right')
+        # Make axes box square in screen units
+        xrange = 4         
+        yrange = 25.05
+        aspect_ratio = xrange / yrange
+        plt.gca().set_aspect(aspect_ratio, adjustable='box')
 
+    plt.legend(loc='upper right')
     plt.show()
 
-    # GluCEST effect for each [Glu]
+    # GluCEST effect for each [conc]
     metabolites = np.arange(len(label_names))
     m_avg = np.array(m_avg)
     m_sem = np.array(m_sem)
 
     # Plot data with error bars
-    plt.figure(figsize=(9, 4))
+    plt.figure(figsize=(5, 5))
     print('--- Plotting GluCEST effect ---')
     plt.errorbar(metabolites, m_avg, yerr=m_sem, fmt='o', label="Average ± SEM", capsize=6)
     plt.xlabel("Metabolites")

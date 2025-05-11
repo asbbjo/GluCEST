@@ -25,7 +25,7 @@ plt.rcParams.update({
     "ytick.labelsize": 7,
     "lines.linewidth": 1,
     "lines.markersize": 4,
-    "figure.dpi": 200,
+    "figure.dpi": 250,
 })
 
 def ppval(p, x):

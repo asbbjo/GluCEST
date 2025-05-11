@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from scipy.interpolate import interp1d, UnivariateSpline
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 import matplotlib.pyplot as plt
 import numpy as np
 import pydicom
@@ -110,34 +111,6 @@ def EVAL_GluCEST(data_path, seq_path, date):
             V.shape[3], V.shape[0], V.shape[1], V.shape[2]
         ).transpose(1, 2, 3, 0)
 
-    print('--- Plotting ---')
-    slice_of_interest = 0 # pick slice for evaluation (0 if only one slice)
-    desired_offset = 3 # pick offset for evaluation (3 for GluCEST at 3 ppm)
-    offset_of_interest = np.where(offsets == desired_offset)[0]  
-    w_offset_of_interest = offsets[offset_of_interest]
-
-    from mpl_toolkits.axes_grid1 import make_axes_locatable
-
-    fig, ax = plt.subplots(figsize=(5, 5), constrained_layout=True) 
-    vmin, vmax = 0.5, 1  # Z-spectra range
-    im = ax.imshow(V_Z_corr_reshaped[:, :, slice_of_interest, offset_of_interest],vmin=vmin, vmax=vmax, cmap='rainbow')
-    divider = make_axes_locatable(ax)
-    cax = divider.append_axes("right", size="5%", pad=0.05)
-    cb = plt.colorbar(im, cax=cax, format="%.2f")
-    cb.set_ticks(np.linspace(vmin, vmax, 5)) 
-    ax.set_title("Z(Δω) = %.2f ppm" % w_offset_of_interest)
-    plt.show()
-
-    fig, ax = plt.subplots(figsize=(5, 5), constrained_layout=True) 
-    vmin, vmax = 0, 0.13 # set GluCEST contrast range
-    im = ax.imshow(V_MTRasym_reshaped[:,:,slice_of_interest,offset_of_interest], vmin=vmin, vmax=vmax, cmap='OrRd')
-    divider = make_axes_locatable(ax)
-    cax = divider.append_axes("right", size="5%", pad=0.05)
-    cb = plt.colorbar(im, cax=cax, format="%.2f")
-    cb.set_ticks(np.linspace(vmin, vmax, 5)) 
-    ax.set_title("MTRasym(Δω) = %.2f ppm" % w_offset_of_interest)
-    plt.show()
-
     # Choose pixels for ROI
     if date == '250312':
         pixels_0mm = [66,71,80,85] # 250312
@@ -196,7 +169,6 @@ def EVAL_GluCEST(data_path, seq_path, date):
         pixels_8mm = [0,2,0,2] # 250409
         pixels_10mm = [41,42,32,33] # clincial scan
 
-
     # Spectrum handling phantom
     array_Z = V_Z_corr_reshaped[pixels_10mm[0]:pixels_10mm[1],pixels_10mm[2]:pixels_10mm[3],0,1:]
     flattened_vectors_Z = array_Z.reshape(-1, array_Z.shape[-1]) 
@@ -206,6 +178,33 @@ def EVAL_GluCEST(data_path, seq_path, date):
     array_MTR = V_MTRasym_reshaped_pc[pixels_10mm[0]:pixels_10mm[1],pixels_10mm[2]:pixels_10mm[3],0,1:]
     flattened_vectors_MTR = array_MTR.reshape(-1, array_MTR.shape[-1]) 
     MTR_spectrum = flattened_vectors_MTR.mean(axis=0)
+
+    print('--- Plotting ---')
+    slice_of_interest = 0 # pick slice for evaluation (0 if only one slice)
+    desired_offset = 3 # pick offset for evaluation (3 for GluCEST at 3 ppm)
+    offset_of_interest = np.where(offsets == desired_offset)[0]  
+    w_offset_of_interest = offsets[offset_of_interest]
+
+    fig, ax = plt.subplots(figsize=(5, 5), constrained_layout=True) 
+    vmin, vmax = 0.5, 1  # Z-spectra range
+    im = ax.imshow(V_Z_corr_reshaped[:, :, slice_of_interest, offset_of_interest],vmin=vmin, vmax=vmax, cmap='rainbow')
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    cb = plt.colorbar(im, cax=cax, format="%.2f")
+    cb.set_ticks(np.linspace(vmin, vmax, 5)) 
+    ax.set_title("Z(Δω) = %.2f ppm" % w_offset_of_interest)
+    plt.show()
+
+    MTR_max = np.max(flattened_vectors_MTR)/100
+    fig, ax = plt.subplots(figsize=(5, 5), constrained_layout=True) 
+    vmin, vmax = 0, MTR_max # set GluCEST contrast range
+    im = ax.imshow(V_MTRasym_reshaped[:,:,slice_of_interest,offset_of_interest], vmin=vmin, vmax=vmax, cmap='OrRd')
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    cb = plt.colorbar(im, cax=cax, format="%.2f")
+    cb.set_ticks(np.linspace(vmin, vmax, 5)) 
+    ax.set_title("MTRasym(Δω) = %.2f ppm" % w_offset_of_interest)
+    plt.show()
     
     plt.figure(figsize=(5, 5), constrained_layout=True)
     plt.axvline(x=3, color='grey', linestyle='--', linewidth=0.8, alpha=0.7)

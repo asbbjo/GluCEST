@@ -18,14 +18,14 @@ plt.rcParams.update({
     "text.usetex": False,  # Set to True if you have LaTeX installed
     "font.family": "serif",
     "font.size": 14,  # IEEE column text is usually around 8-9 pt
-    "axes.labelsize": 9,
-    "axes.titlesize": 12,
-    "legend.fontsize": 8,
+    "axes.labelsize": 8,
+    "axes.titlesize": 8,
+    "legend.fontsize": 7,
     "xtick.labelsize": 7,
     "ytick.labelsize": 7,
     "lines.linewidth": 1,
-    "lines.markersize": 3.5,
-    "figure.dpi": 150,
+    "lines.markersize": 4,
+    "figure.dpi": 300,
 })
 
 def ppval(p, x):
@@ -151,11 +151,13 @@ def EVAL_GluCEST(data_path, seq_path, date):
         pixels_6mm = [77,82,67,72] # 250324
         pixels_8mm = [72,77,48,53] # 250324
         pixels_10mm = [54,59,42,47] # 250324
+
     array_Z = V_Z_corr_reshaped[pixels_10mm[0]:pixels_10mm[1],pixels_10mm[2]:pixels_10mm[3],0,1:]
     flattened_vectors_Z = array_Z.reshape(-1, array_Z.shape[-1]) 
     average_vector_Z = flattened_vectors_Z.mean(axis=0)
 
-    array_MTR = V_MTRasym_reshaped[pixels_10mm[0]:pixels_10mm[1],pixels_10mm[2]:pixels_10mm[3],0,1:]
+    V_MTRasym_reshaped_pc = V_MTRasym_reshaped*100
+    array_MTR = V_MTRasym_reshaped_pc[pixels_10mm[0]:pixels_10mm[1],pixels_10mm[2]:pixels_10mm[3],0,1:]
     flattened_vectors_MTR = array_MTR.reshape(-1, array_MTR.shape[-1]) 
     average_vector_MTR = flattened_vectors_MTR.mean(axis=0)
 
@@ -168,15 +170,15 @@ def EVAL_GluCEST(data_path, seq_path, date):
 if __name__ == "__main__":
 
     # 250312
-    dcm_names = np.array(['23','28','29','30','32','33','34'])
-    label_names = ['10e-6s', '1s', '2s', '3s', '4s', '6s', '10s']
+    '''dcm_names = np.array(['23','28','29','30','32','33','34'])
+    label_names = ['10e-6s', '1s', '2s', '3s', '4s', '6s', '10s']'''
 
     # 250313
     '''dcm_names = np.array(['12','13','14','15','16'])
     label_names = ['1uT', '2uT', '3uT', '4uT', '5uT']'''
 
     # 250317
-    '''dcm_names = np.array(['22','24','14','23','25'])
+    dcm_names = np.array(['22','24','14','23','25'])
     label_names = ['15ms', '30ms', '50ms', '100ms', '300ms'] # Different ROI for E14'''
 
     # 250324
@@ -192,40 +194,58 @@ if __name__ == "__main__":
     #dcm_names = np.array(['13','18','23','35'])
     #label_names = ['baseline 1', 'baseline 2', 'baseline 3', 'baseline 4']'''
 
-    plt.figure(figsize=(10, 4))
+    plt.figure(figsize=(5, 5))
     colors = plt.cm.rainbow(np.linspace(0, 1, len(dcm_names)))
 
-    date = '250312'
+    date = '250317'
     print(date)
-    input('Correct path for you acquisitions?\n')
+    input('Correct path for you acquisitions? Correct title of the plots?\n')
     for i in range(len(dcm_names)):
         print(f'Loop: {i+1}')
-        data_path = str(r'C:\asb\ntnu\MRIscans\250312\dicoms\E') + dcm_names[i]
-        seq_path = str(r'C:\asb\ntnu\MRIscans\250312\seq_files\seq_file_E') + dcm_names[i] + str('.seq')
+        data_path = str(r'C:\asb\ntnu\MRIscans\250317\dicoms\E') + dcm_names[i]
+        seq_path = str(r'C:\asb\ntnu\MRIscans\250317\seq_files\seq_file_E') + dcm_names[i] + str('.seq')
         w, Z_spectrum, MTR_spectrum = EVAL_GluCEST(data_path, seq_path, date)
 
-        plt.subplot(1, 2, 1)
-        plt.plot(w, Z_spectrum, marker='o', markersize=2, label=label_names[i], color=colors[i])
+        plt.axvline(x=3, color='grey', linestyle='--', linewidth=0.8, alpha=0.7)
         plt.xlim([-5, 5])
         plt.ylim([0.12,1.1])
-        plt.axvline(x=3, color='grey', linestyle='--', linewidth=0.8, alpha=0.7)
-        plt.xlabel('Frequency offset [ppm]')
+        plt.plot(w, Z_spectrum, marker='o', markersize=2, label=label_names[i], color=colors[i])
+        plt.xlabel('Frequency offset Δω [ppm]')
         plt.ylabel('Normalized MTR')
         plt.gca().invert_xaxis()
-        plt.title("Z-spectra in 10 mM Glu")
         plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
-        plt.legend()
+        plt.title("Z-spectra for different pulse lengths")
+        # Make axes box square in screen units
+        xrange = 10       
+        yrange = 1.1 - 0.12
+        aspect_ratio = xrange / yrange
+        plt.gca().set_aspect(aspect_ratio, adjustable='box')
+        
+    plt.legend(loc='lower right')
+    plt.show()
 
-        plt.subplot(1, 2, 2)
+    plt.figure(figsize=(5, 5))
+    colors = plt.cm.rainbow(np.linspace(0, 1, len(dcm_names)))
+    for i in range(len(dcm_names)):
+        print(f'Loop: {i+1}')
+        data_path = str(r'C:\asb\ntnu\MRIscans\250317\dicoms\E') + dcm_names[i]
+        seq_path = str(r'C:\asb\ntnu\MRIscans\250317\seq_files\seq_file_E') + dcm_names[i] + str('.seq')
+        w, Z_spectrum, MTR_spectrum = EVAL_GluCEST(data_path, seq_path, date)
+
         plt.plot(w, MTR_spectrum, marker='o', markersize=2, label=label_names[i], color=colors[i])
-        plt.xlim([0, 4])
-        plt.ylim([-0.05,0.3])
         plt.axvline(x=3, color='grey', linestyle='--', linewidth=0.8, alpha=0.7)
-        plt.xlabel('Frequency offset [ppm]')
+        plt.xlim([0, 4])
+        plt.ylim([-0.05,25])
+        plt.xlabel('Frequency offset Δω [ppm]')
         plt.ylabel('MTRasym [%]')
         plt.gca().invert_xaxis()
-        plt.title("MTRasym-spectra in 10 mM Glu")
+        plt.title("MTRasym-spectra for different pulse lengths")
         plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
-        plt.legend()
-
+        # Make axes box square in screen units
+        xrange = 4         
+        yrange = 25.05
+        aspect_ratio = xrange / yrange
+        plt.gca().set_aspect(aspect_ratio, adjustable='box')
+        
+    plt.legend(loc='upper right')
     plt.show()
