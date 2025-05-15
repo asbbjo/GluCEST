@@ -183,16 +183,16 @@ def EVAL_GluCEST(data_path, seq_path, date):
     plt.figure(figsize=(5, 5), constrained_layout=True)
     plt.axvline(x=3, color='grey', linestyle='--', linewidth=0.8, alpha=0.7)
     plt.xlim([-5, 5])
-    plt.ylim([0.62,1.02])
+    plt.ylim([0.47,1.02])
     plt.plot(w, Z_spectrum, "r.-")
     plt.xlabel('Frequency offset Δω [ppm]')
-    plt.ylabel('Normalized MTR')
+    plt.ylabel(r'$S_{\mathrm{sat}}/S_{\mathrm{0}}$')
     plt.gca().invert_xaxis()
     plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
     plt.title("Mean Z-spectrum for 10mM")
     # Make axes box square in screen units
     xrange = 10       
-    yrange = 1.02 - 0.62
+    yrange = 1.02 - 0.47
     aspect_ratio = xrange / yrange
     plt.gca().set_aspect(aspect_ratio, adjustable='box')
     plt.show()

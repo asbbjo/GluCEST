@@ -19,14 +19,14 @@ plt.rcParams.update({
     "text.usetex": False,  # Set to True if you have LaTeX installed
     "font.family": "serif",
     "font.size": 14,  # IEEE column text is usually around 8-9 pt
-    "axes.labelsize": 8,
-    "axes.titlesize": 8,
-    "legend.fontsize": 7,
-    "xtick.labelsize": 7,
-    "ytick.labelsize": 7,
+    "axes.labelsize": 7,
+    "axes.titlesize": 7,
+    "legend.fontsize": 6,
+    "xtick.labelsize": 6,
+    "ytick.labelsize": 6,
     "lines.linewidth": 1,
     "lines.markersize": 4,
-    "figure.dpi": 300,
+    "figure.dpi": 250,
 })
 
 def ppval(p, x):
@@ -232,7 +232,7 @@ def EVAL_GluCEST(data_path, seq_path, date):
     plt.figure(figsize=(5, 5), constrained_layout=True)
     plt.axvline(x=3, color='grey', linestyle='--', linewidth=0.8, alpha=0.7)
     plt.xlim([-5, 5])
-    plt.ylim([0.12,1.1])
+    plt.ylim([0.25,1.09])
     plt.plot(w, Z_spectrum, "r.-")
     plt.xlabel('Frequency offset Δω [ppm]')
     plt.ylabel('Normalized MTR')
@@ -241,7 +241,7 @@ def EVAL_GluCEST(data_path, seq_path, date):
     plt.title("Mean Z-spectrum for 10mM")
     # Make axes box square in screen units
     xrange = 10       
-    yrange = 1.1 - 0.12
+    yrange = 1.09 - 0.25
     aspect_ratio = xrange / yrange
     plt.gca().set_aspect(aspect_ratio, adjustable='box')
     plt.show()

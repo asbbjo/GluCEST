@@ -19,14 +19,14 @@ plt.rcParams.update({
     "text.usetex": False,  # Set to True if you have LaTeX installed
     "font.family": "serif",
     "font.size": 14,  # IEEE column text is usually around 8-9 pt
-    "axes.labelsize": 8,
-    "axes.titlesize": 8,
-    "legend.fontsize": 7,
-    "xtick.labelsize": 7,
-    "ytick.labelsize": 7,
+    "axes.labelsize": 7,
+    "axes.titlesize": 7,
+    "legend.fontsize": 6,
+    "xtick.labelsize": 6,
+    "ytick.labelsize": 6,
     "lines.linewidth": 1,
     "lines.markersize": 4,
-    "figure.dpi": 300,
+    "figure.dpi": 250,
 })
 
 def ppval(p, x):
@@ -182,10 +182,10 @@ def EVAL_GluCEST(data_path, seq_path):
         plt.ylim([0.12,1.1])
         plt.plot(w, Z_spectrum, marker='o', markersize=2, label=label_names[i], color=colors[i])
         plt.xlabel('Frequency offset Δω [ppm]')
-        plt.ylabel('Normalized MTR')
+        plt.ylabel(r'$S_{\mathrm{sat}}/S_{\mathrm{0}}$')
         plt.gca().invert_xaxis()
         plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
-        plt.title("Z-spectra for different metabolites")
+        #plt.title("Z-spectra for different metabolites")
         # Make axes box square in screen units
         xrange = 10       
         yrange = 1.1 - 0.12
@@ -246,6 +246,6 @@ def EVAL_GluCEST(data_path, seq_path):
 if __name__ == "__main__":
     globals()["EVAL_GluCEST"] = EVAL_GluCEST 
     EVAL_GluCEST(
-        data_path=r'C:\asb\ntnu\MRIscans\250410\dicoms\E4', 
-        seq_path=r'C:\asb\ntnu\MRIscans\250410\seq_files\seq_file_E4.seq',
+        data_path=r'C:\asb\ntnu\MRIscans\250409\dicoms\E10', 
+        seq_path=r'C:\asb\ntnu\MRIscans\250409\seq_files\seq_file_E10.seq',
     )

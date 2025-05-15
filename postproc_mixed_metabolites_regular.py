@@ -18,15 +18,15 @@ import scipy as sc
 plt.rcParams.update({
     "text.usetex": False,  # Set to True if you have LaTeX installed
     "font.family": "serif",
-    "font.size": 8,  # IEEE column text is usually around 8-9 pt
-    "axes.labelsize": 8,
-    "axes.titlesize": 8,
-    "legend.fontsize": 7,
-    "xtick.labelsize": 7,
-    "ytick.labelsize": 7,
+    "font.size": 14,  # IEEE column text is usually around 8-9 pt
+    "axes.labelsize": 7,
+    "axes.titlesize": 7,
+    "legend.fontsize": 6,
+    "xtick.labelsize": 6,
+    "ytick.labelsize": 6,
     "lines.linewidth": 1,
     "lines.markersize": 4,
-    "figure.dpi": 300,
+    "figure.dpi": 250,
 })
 
 def ppval(p, x):
@@ -145,6 +145,17 @@ def EVAL_GluCEST(data_path, seq_path):
     array_MTR2 = V_MTRasym_reshaped[pixels_glu2[0]:pixels_glu2[1],pixels_glu2[2]:pixels_glu2[3],slice_of_interest,1:] # 1: to remove the M0 scan
     flattened_vectors_MTR_glu2 = array_MTR2.reshape(-1, array_MTR2.shape[-1]) 
 
+    # For Bland Altman plotting
+    '''glu1 = V_MTRasym_reshaped[pixels_glu1[0]:pixels_glu1[1],pixels_glu1[2]:pixels_glu1[3],slice_of_interest,offset_of_interest]
+    glu2 = V_MTRasym_reshaped[pixels_glu2[0]:pixels_glu2[1],pixels_glu2[2]:pixels_glu2[3],slice_of_interest,offset_of_interest]
+
+    flatten_glu1 = glu1.flatten()
+    flatten_glu2 = glu2.flatten()
+
+    # Save to text file
+    np.savetxt(r'C:\asb\ntnu\master\GluCEST\flattened_glu1.txt', flatten_glu1, fmt="%.6f")  # or fmt="%d" for integers
+    np.savetxt(r'C:\asb\ntnu\master\GluCEST\flattened_glu2.txt', flatten_glu2, fmt="%.6f")  # or fmt="%d" for integers'''
+
     MTR_max1 = np.max(flattened_vectors_MTR_glu1)
     MTR_max2 = np.max(flattened_vectors_MTR_glu2)
     MTR_max = max(MTR_max1, MTR_max2)
@@ -189,10 +200,10 @@ def EVAL_GluCEST(data_path, seq_path):
         plt.ylim([0.12,1.1])
         plt.plot(w, Z_spectrum, marker='o', markersize=2, label=label_names[i], color=colors[i])
         plt.xlabel('Frequency offset Δω [ppm]')
-        plt.ylabel('Normalized MTR')
+        plt.ylabel(r'$S_{\mathrm{sat}}/S_{\mathrm{0}}$')
         plt.gca().invert_xaxis()
         plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
-        plt.title("Z-spectra for mixed metabolites")
+        #plt.title("Z-spectra for mixed metabolites")
         # Make axes box square in screen units
         xrange = 10       
         yrange = 1.1 - 0.12

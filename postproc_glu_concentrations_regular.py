@@ -19,14 +19,14 @@ plt.rcParams.update({
     "text.usetex": False,  # Set to True if you have LaTeX installed
     "font.family": "serif",
     "font.size": 14,  # IEEE column text is usually around 8-9 pt
-    "axes.labelsize": 8,
-    "axes.titlesize": 8,
-    "legend.fontsize": 7,
-    "xtick.labelsize": 7,
-    "ytick.labelsize": 7,
+    "axes.labelsize": 7,
+    "axes.titlesize": 7,
+    "legend.fontsize": 6,
+    "xtick.labelsize": 6,
+    "ytick.labelsize": 6,
     "lines.linewidth": 1,
     "lines.markersize": 4,
-    "figure.dpi": 300,
+    "figure.dpi": 250,
 })
 
 def ppval(p, x):
@@ -61,6 +61,12 @@ def EVAL_GluCEST(data_path, seq_path, date):
     V = np.transpose(V[:,:,:,-1], (1, 2, 0)) # erase the last dimention due to jpeg format ([52,128,128,3] => [52,128,128])
     sz = V.shape
     V = np.reshape(V, [sz[0], sz[1], n_meas, sz[2] // n_meas]).transpose(0, 1, 3, 2)
+
+    '''image_to_plot = V[:, :, 0, 15]
+    plt.figure(figsize=(5, 5))
+    plt.imshow(image_to_plot, cmap='gray')
+    plt.title(f'DICOM Slice: frame {0}, measurement {15}')
+    plt.show() #plot a DICOM '''
 
     # Vectorization
     threshold = 100 #np.max(V)*0.1 # threshold of 10%
@@ -212,10 +218,10 @@ def EVAL_GluCEST(data_path, seq_path, date):
     plt.ylim([0.12,1.1])
     plt.plot(w, Z_spectrum, "r.-")
     plt.xlabel('Frequency offset Δω [ppm]')
-    plt.ylabel('Normalized MTR')
+    plt.ylabel(r'$S_{\mathrm{sat}}/S_{\mathrm{0}}$')
     plt.gca().invert_xaxis()
     plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
-    plt.title("Mean Z-spectrum for 10mM")
+    #plt.title("Mean Z-spectrum for 10mM")
     # Make axes box square in screen units
     xrange = 10       
     yrange = 1.1 - 0.12

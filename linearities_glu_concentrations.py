@@ -7,6 +7,7 @@ import pydicom
 import pypulseq as pp
 from csaps import csaps
 import scipy as sc
+from sklearn.metrics import r2_score
 
 # Store dicoms of each offsets in one folder
 # Create a sequence file for the acquisition
@@ -17,15 +18,15 @@ import scipy as sc
 plt.rcParams.update({
     "text.usetex": False,  # Set to True if you have LaTeX installed
     "font.family": "serif",
-    "font.size": 15,  # IEEE column text is usually around 8-9 pt
-    "axes.labelsize": 9,
-    "axes.titlesize": 12,
-    "legend.fontsize": 8,
-    "xtick.labelsize": 7,
-    "ytick.labelsize": 7,
+    "font.size": 14,  # IEEE column text is usually around 8-9 pt
+    "axes.labelsize": 7,
+    "axes.titlesize": 7,
+    "legend.fontsize": 6,
+    "xtick.labelsize": 6,
+    "ytick.labelsize": 6,
     "lines.linewidth": 1,
     "lines.markersize": 4,
-    "figure.dpi": 250,
+    "figure.dpi": 220,
 })
 
 def ppval(p, x):
@@ -183,28 +184,28 @@ def EVAL_GluCEST(data_path, seq_path, date):
 if __name__ == "__main__":
 
     # 250312
-    '''dcm_names = np.array(['23','28','29','30','32','33','34'])
+    dcm_names = np.array(['23','28','29','30','32','33','34'])
     label_names = ['10e-6s', '1s', '2s', '3s', '4s', '6s', '10s']
-    title = str("Linear trends with recovery times")'''
+    title = str("Linear trends with recovery times")
 
     # 250313
     '''dcm_names = np.array(['12','13','14','15','16'])
-    label_names = ['1uT', '2uT', '3uT', '4uT', '5uT']
-    title = str("Linear trends with pulse powers")'''
+    label_names = ['1 μT', '2 μT', '3 μT', '4 μT', '5 μT']
+    title = str("Linear trends with saturation power")'''
 
     # 250317
-    dcm_names = np.array(['22','24','14','23','25'])
+    '''dcm_names = np.array(['22','24','14','23','25'])
     label_names = ['15ms', '30ms', '50ms', '100ms', '300ms'] # Different ROI for E14
-    title = str("Linear trends with pulse lengths")
+    title = str("Linear trends with pulse length")'''
 
     # 250324
     '''dcm_names = np.array(['10','11','12','13','14','15'])
     label_names = ['10e-5s', '1s', '2s', '3s', '5s', '10s']
-    title = str("Linear trends with recovery times")
+    title = str("Linear trends with recovery time")
 
     #dcm_names = np.array(['16','17','18','19','20']) 
     #label_names = ['1uT', '2uT', '3uT', '4uT', '5uT'] 
-    #title = str("Linear trends with pulse powers")
+    #title = str("Linear trends with pulse power")
 
     #dcm_names = np.array(['21','22','23','24','25'])
     #label_names = ['15ms', '30ms', '50ms', '100ms', '300ms']
@@ -214,16 +215,16 @@ if __name__ == "__main__":
     #label_names = ['baseline 1', 'baseline 2', 'baseline 3', 'baseline 4']
     #title = str("Linear trends with baseline measurements")'''
 
-    plt.figure(figsize=(10, 4))
+    plt.figure(figsize=(5, 5))
     colors = plt.cm.rainbow(np.linspace(0, 1, len(dcm_names)))
 
-    date = '250317'
+    date = '250312'
     print(date)
     input('Correct path for you acquisitions?\n')
     for i in range(len(dcm_names)):
         print(f'Loop: {i+1}')
-        data_path = str(r'C:\asb\ntnu\MRIscans\250317\dicoms\E') + dcm_names[i]
-        seq_path = str(r'C:\asb\ntnu\MRIscans\250317\seq_files\seq_file_E') + dcm_names[i] + str('.seq')
+        data_path = str(r'C:\asb\ntnu\MRIscans\250312\dicoms\E') + dcm_names[i]
+        seq_path = str(r'C:\asb\ntnu\MRIscans\250312\seq_files\seq_file_E') + dcm_names[i] + str('.seq')
         mm, mm_avg, mm_sem = EVAL_GluCEST(data_path, seq_path, date)
 
         # Fit a linear trend line
@@ -232,7 +233,16 @@ if __name__ == "__main__":
 
         # MSE
         mse = np.mean((mm_avg - trend_line) ** 2)
-        label_uT = str(label_names[i]) + ":   MSE = " + str(round(mse,3))
+        label_uT = str(label_names[i]) # + ":   MSE = " + str(round(mse,3))
+
+        # Fit linear model
+        coeffs = np.polyfit(mm, mm_avg, 1)
+        y_pred = np.polyval(coeffs, mm)
+
+        # Calculate R²
+        r2 = r2_score(mm_avg, y_pred)
+        print(f"R²: {r2:.4f}")
+        
         
         # Plot data with error bars
         plt.errorbar(mm, mm_avg, yerr=mm_sem, fmt='o', label=label_uT, capsize=6, color=colors[i])
@@ -243,6 +253,10 @@ if __name__ == "__main__":
         # Labels and legend
         plt.xlabel("Concentration of Glu [mM]")
         plt.ylabel("MTRasym contrast [%]")
+        xrange = 10       
+        yrange = 15
+        aspect_ratio = xrange / yrange
+        plt.gca().set_aspect(aspect_ratio, adjustable='box')
         plt.title(title)
         plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
         plt.legend()

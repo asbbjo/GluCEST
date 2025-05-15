@@ -190,7 +190,7 @@ if __name__ == "__main__":
 
 
     mm = np.array([0,1,2,3,5,10])
-    plt.figure(figsize=(12, 4))
+    plt.figure(figsize=(5, 5))
     colors = plt.cm.rainbow(np.linspace(0, 1, len(label_names)))
 
     for i in range(len(MTR_contrasts_avg[0])):
@@ -200,7 +200,7 @@ if __name__ == "__main__":
 
         # MSE
         mse = np.mean((MTR_contrasts_avg[i] - trend_line) ** 2)
-        label_uT = str(metabolites[i]) + ":   MSE = " + str(round(mse,4))
+        label_uT = str(metabolites[i]) #+ ":   MSE = " + str(round(mse,4))
         
         # Plot data with error bars
         plt.errorbar(mm, MTR_contrasts_avg[i], yerr=MTR_contrasts_sem[i], fmt='o', label=label_uT, capsize=6, color=colors[i])
@@ -212,8 +212,12 @@ if __name__ == "__main__":
         plt.xlabel("Recovery times")
         plt.ylabel("MTRasym contrast [%]")
         plt.title(title)
+        xrange = 10       
+        yrange = 13
+        aspect_ratio = xrange / yrange
+        plt.gca().set_aspect(aspect_ratio, adjustable='box')
         plt.xticks(mm, label_names)
         plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
-        plt.legend()
+        plt.legend(loc='center left')
 
     plt.show()
