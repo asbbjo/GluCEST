@@ -160,9 +160,17 @@ def EVAL_GluCEST(data_path, seq_path):
     ax.set_title("Z(Δω) = %.2f ppm" % w_offset_of_interest)
     plt.show()
 
-    pixels_glu = pixels_dict.get('glu')
+    pixels_glu = pixels_dict.get('taurine')
     array_MTR = V_MTRasym_reshaped[pixels_glu[0]:pixels_glu[1],pixels_glu[2]:pixels_glu[3],slice_of_interest,1:] # 1: to remove the M0 scan
     flattened_vectors_MTR_glu = array_MTR.reshape(-1, array_MTR.shape[-1]) 
+
+    # For Bland Altman plotting
+    glu1 = V_MTRasym_reshaped[pixels_glu[0]:pixels_glu[1],pixels_glu[2]:pixels_glu[3],slice_of_interest,offset_of_interest]
+
+    flatten_glu1 = glu1.flatten()
+
+    # Save to text file
+    np.savetxt(r'C:\asb\ntnu\master\GluCEST\flattened_Taurine_opt.txt', flatten_glu1, fmt="%.6f")  # or fmt="%d" for integers
 
     MTR_max = np.max(flattened_vectors_MTR_glu)
     fig, ax = plt.subplots(figsize=(5, 5)) 
@@ -233,7 +241,7 @@ def EVAL_GluCEST(data_path, seq_path):
         plt.plot(w, MTR_spectrum, marker='o', markersize=2, label=label_names[i], color=colors[i])
         plt.axvline(x=3, color='grey', linestyle='--', linewidth=0.8, alpha=0.7)
         plt.xlim([0, 4])
-        plt.ylim([-0.05,25])
+        plt.ylim([-0.1,12])
         plt.xlabel('Frequency offset Δω [ppm]')
         plt.ylabel('MTRasym [%]')
         plt.gca().invert_xaxis()
@@ -241,7 +249,7 @@ def EVAL_GluCEST(data_path, seq_path):
         plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
         # Make axes box square in screen units
         xrange = 4         
-        yrange = 25.05
+        yrange = 12.1
         aspect_ratio = xrange / yrange
         plt.gca().set_aspect(aspect_ratio, adjustable='box')
 

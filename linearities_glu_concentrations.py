@@ -19,11 +19,11 @@ plt.rcParams.update({
     "text.usetex": False,  # Set to True if you have LaTeX installed
     "font.family": "serif",
     "font.size": 14,  # IEEE column text is usually around 8-9 pt
-    "axes.labelsize": 7,
-    "axes.titlesize": 7,
-    "legend.fontsize": 6,
-    "xtick.labelsize": 6,
-    "ytick.labelsize": 6,
+    "axes.labelsize": 9,
+    "axes.titlesize": 9,
+    "legend.fontsize": 8,
+    "xtick.labelsize": 8,
+    "ytick.labelsize": 8,
     "lines.linewidth": 1,
     "lines.markersize": 4,
     "figure.dpi": 220,
@@ -184,14 +184,14 @@ def EVAL_GluCEST(data_path, seq_path, date):
 if __name__ == "__main__":
 
     # 250312
-    dcm_names = np.array(['23','28','29','30','32','33','34'])
+    '''dcm_names = np.array(['23','28','29','30','32','33','34'])
     label_names = ['10e-6s', '1s', '2s', '3s', '4s', '6s', '10s']
-    title = str("Linear trends with recovery times")
+    title = str("Linear trends with recovery times")'''
 
     # 250313
-    '''dcm_names = np.array(['12','13','14','15','16'])
+    dcm_names = np.array(['12','13','14','15','16'])
     label_names = ['1 μT', '2 μT', '3 μT', '4 μT', '5 μT']
-    title = str("Linear trends with saturation power")'''
+    title = str("Linear trends with saturation power")
 
     # 250317
     '''dcm_names = np.array(['22','24','14','23','25'])
@@ -218,13 +218,13 @@ if __name__ == "__main__":
     plt.figure(figsize=(5, 5))
     colors = plt.cm.rainbow(np.linspace(0, 1, len(dcm_names)))
 
-    date = '250312'
+    date = '250313'
     print(date)
     input('Correct path for you acquisitions?\n')
     for i in range(len(dcm_names)):
         print(f'Loop: {i+1}')
-        data_path = str(r'C:\asb\ntnu\MRIscans\250312\dicoms\E') + dcm_names[i]
-        seq_path = str(r'C:\asb\ntnu\MRIscans\250312\seq_files\seq_file_E') + dcm_names[i] + str('.seq')
+        data_path = str(r'C:\asb\ntnu\MRIscans\250313\dicoms\E') + dcm_names[i]
+        seq_path = str(r'C:\asb\ntnu\MRIscans\250313\seq_files\seq_file_E') + dcm_names[i] + str('.seq')
         mm, mm_avg, mm_sem = EVAL_GluCEST(data_path, seq_path, date)
 
         # Fit a linear trend line
@@ -252,9 +252,9 @@ if __name__ == "__main__":
 
         # Labels and legend
         plt.xlabel("Concentration of Glu [mM]")
-        plt.ylabel("MTRasym contrast [%]")
+        plt.ylabel("gluCEST [%]")
         xrange = 10       
-        yrange = 15
+        yrange = 22
         aspect_ratio = xrange / yrange
         plt.gca().set_aspect(aspect_ratio, adjustable='box')
         plt.title(title)

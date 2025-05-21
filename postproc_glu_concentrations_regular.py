@@ -289,7 +289,7 @@ def EVAL_GluCEST(data_path, seq_path, date):
 if __name__ == "__main__":
     globals()["EVAL_GluCEST"] = EVAL_GluCEST 
     EVAL_GluCEST(
-        data_path=r'C:\asb\ntnu\MRIscans\250313\dicoms\E14', 
-        seq_path=r'C:\asb\ntnu\MRIscans\250313\seq_files\seq_file_E14.seq',
+        data_path=r'C:\asb\ntnu\MRIscans\250313\dicoms\E16', 
+        seq_path=r'C:\asb\ntnu\MRIscans\250313\seq_files\seq_file_E16.seq',
         date = '250313'
     )

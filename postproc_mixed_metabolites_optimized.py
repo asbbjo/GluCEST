@@ -136,7 +136,7 @@ def EVAL_GluCEST(data_path, seq_path):
     # Choose pixels for ROI
     pixels_dict = { 
         '10glu 2gln': [76,81,79,84],    # 250410
-        '6glu 2gln': [57,62,86,88],     # 250410
+        '6glu 2gln': [57,62,86,91],     # 250410
         '2glu 2gln': [42,47,74,79],     # 250410
         '10glu 2gaba': [46,51,54,59],   # 250410
         '6glu 2gaba': [63,68,47,52],    # 250410
@@ -159,16 +159,16 @@ def EVAL_GluCEST(data_path, seq_path):
     ax.set_title("Z(Δω) = %.2f ppm" % w_offset_of_interest)
     plt.show()
 
-    pixels_glu1 = pixels_dict.get('10glu 2gln')
+    pixels_glu1 = pixels_dict.get('6glu 2gln')
     array_MTR1 = V_MTRasym_reshaped[pixels_glu1[0]:pixels_glu1[1],pixels_glu1[2]:pixels_glu1[3],slice_of_interest,1:] # 1: to remove the M0 scan
     flattened_vectors_MTR_glu1 = array_MTR1.reshape(-1, array_MTR1.shape[-1]) 
 
-    pixels_glu2 = pixels_dict.get('10glu 2gaba')
+    pixels_glu2 = pixels_dict.get('6glu 2gaba')
     array_MTR2 = V_MTRasym_reshaped[pixels_glu2[0]:pixels_glu2[1],pixels_glu2[2]:pixels_glu2[3],slice_of_interest,1:] # 1: to remove the M0 scan
     flattened_vectors_MTR_glu2 = array_MTR2.reshape(-1, array_MTR2.shape[-1]) 
 
     # For Bland Altman plotting
-    '''glu1 = V_MTRasym_reshaped[pixels_glu1[0]:pixels_glu1[1],pixels_glu1[2]:pixels_glu1[3],slice_of_interest,offset_of_interest]
+    glu1 = V_MTRasym_reshaped[pixels_glu1[0]:pixels_glu1[1],pixels_glu1[2]:pixels_glu1[3],slice_of_interest,offset_of_interest]
     glu2 = V_MTRasym_reshaped[pixels_glu2[0]:pixels_glu2[1],pixels_glu2[2]:pixels_glu2[3],slice_of_interest,offset_of_interest]
 
     flatten_glu1 = glu1.flatten()

@@ -137,11 +137,11 @@ def EVAL_GluCEST(data_path, seq_path):
     ax.set_title("Z(Δω) = %.2f ppm" % w_offset_of_interest)
     plt.show()
 
-    pixels_glu1 = pixels_dict.get('10glu 2gln')
+    pixels_glu1 = pixels_dict.get('2glu 2gln')
     array_MTR1 = V_MTRasym_reshaped[pixels_glu1[0]:pixels_glu1[1],pixels_glu1[2]:pixels_glu1[3],slice_of_interest,1:] # 1: to remove the M0 scan
     flattened_vectors_MTR_glu1 = array_MTR1.reshape(-1, array_MTR1.shape[-1]) 
 
-    pixels_glu2 = pixels_dict.get('10glu 2gaba')
+    pixels_glu2 = pixels_dict.get('2glu 2gaba')
     array_MTR2 = V_MTRasym_reshaped[pixels_glu2[0]:pixels_glu2[1],pixels_glu2[2]:pixels_glu2[3],slice_of_interest,1:] # 1: to remove the M0 scan
     flattened_vectors_MTR_glu2 = array_MTR2.reshape(-1, array_MTR2.shape[-1]) 
 
