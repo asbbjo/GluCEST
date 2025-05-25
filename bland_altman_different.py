@@ -30,11 +30,11 @@ datasets = [
 # Assign a unique color to each metabolite
 metab_colors = {
     'Glu': 'red',
-    'NAA': 'blue',
-    'Taurine': 'green',
-    'GABA': 'purple',
-    'Cr': 'orange',
     'Gln': 'brown',
+    'GABA': 'purple',
+    'NAA': 'blue',
+    'Cr': 'orange',
+    'Taurine': 'green',
 }
 
 # Prepare containers
@@ -80,7 +80,7 @@ print(mean_diff, std_diff*1.96)
 # Labels and title
 plt.xlabel('Mean gluCEST effect [%]')
 plt.ylabel('Difference of gluCEST effect [%]')
-plt.title('Comparison of the regular and the optimized offset list')
+#plt.title('Comparison of the regular and the optimized offset list')
 
 # Axis formatting
 plt.ylim([-2, 3])
@@ -88,13 +88,26 @@ plt.gca().xaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f'{x:.0f}'))
 
 # Custom legend for metabolites
 legend_elements = [
-    Line2D([0], [0], marker='o', color='w', label=metab, markerfacecolor=color, markersize=6)
+    Line2D([0], [0], marker='o', color='w', label=metab,
+           markerfacecolor=color, markersize=6, alpha=0.3)
     for metab, color in metab_colors.items()
 ]
 legend_elements.append(Line2D([], [], color='black', linestyle='--', label='Mean difference'))
+legend_elements.append(Line2D([], [], color='gray', linestyle='--', label='±1.96 SD'))
 
 plt.legend(handles=legend_elements, loc='upper right')
 
+xrange = 10         
+yrange = 5
+aspect_ratio = xrange / yrange
+plt.gca().set_aspect(aspect_ratio, adjustable='box')
+
+import os 
+
 # Grid and layout
 plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
+plot_name = str("Bland_Altman_different")
+my_path = r"c:\asb\ntnu\plotting\auto_save_png"
+save_path = os.path.join(my_path, plot_name + ".png")
+plt.savefig(save_path, format='png', bbox_inches='tight')
 plt.show()

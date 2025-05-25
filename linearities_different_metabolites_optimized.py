@@ -172,7 +172,7 @@ if __name__ == "__main__":
 
     # 250312
     dcm_names = np.array(['9','14','18','7','22','26'])
-    label_names = ['10e-6s', '1s', '2s', '3s', '5s', '10s']
+    label_names = ['10⁻⁶', '1', '2', '3', '5', '10']
     title = str("Linear trends with recovery times")
 
     MTR_contrasts_avg = np.empty((6,6),dtype=float)
@@ -209,9 +209,9 @@ if __name__ == "__main__":
         plt.plot(mm, trend_line,'--', color=colors[i])
 
         # Labels and legend
-        plt.xlabel("Recovery times")
-        plt.ylabel("MTRasym contrast [%]")
-        plt.title(title)
+        plt.xlabel("Recovery time [s]")
+        plt.ylabel("gluCEST [%]")
+        #plt.title(title)
         xrange = 10       
         yrange = 13
         aspect_ratio = xrange / yrange
@@ -220,4 +220,8 @@ if __name__ == "__main__":
         plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
         plt.legend(loc='center left')
 
-    plt.show()
+    my_path = r"c:\asb\ntnu\plotting\auto_save_png\different"
+    plot_name = str("linearities_different_metabolites_T_rec")
+    save_path = os.path.join(my_path, plot_name + ".png")
+    plt.savefig(save_path, format='png', bbox_inches='tight')
+    #plt.show()

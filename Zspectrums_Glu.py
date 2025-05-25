@@ -170,15 +170,15 @@ def EVAL_GluCEST(data_path, seq_path, date):
 if __name__ == "__main__":
 
     # 250312
-    '''dcm_names = np.array(['23','28','29','30','32','33','34'])
-    label_names = ['10e-6s', '1s', '2s', '3s', '4s', '6s', '10s']'''
+    dcm_names = np.array(['23','28','29','30','32','33','34'])
+    label_names = ['10e-6s', '1s', '2s', '3s', '4s', '6s', '10s']
 
     # 250313
     '''dcm_names = np.array(['12','13','14','15','16'])
     label_names = ['1 μT', '2 μT', '3 μT', '4 μT', '5 μT']'''
 
     # 250317
-    dcm_names = np.array(['22','24','14','23','25'])
+    '''dcm_names = np.array(['22','24','14','23','25'])
     label_names = ['15ms', '30ms', '50ms', '100ms', '300ms'] # Different ROI for E14'''
 
     # 250324
@@ -197,14 +197,16 @@ if __name__ == "__main__":
     plt.figure(figsize=(5, 5))
     colors = plt.cm.rainbow(np.linspace(0, 1, len(dcm_names)))
 
-    date = '250317'
+    date = '250312'
     print(date)
     input('Correct path for you acquisitions? Correct title of the plots?\n')
     for i in range(len(dcm_names)):
         print(f'Loop: {i+1}')
-        data_path = str(r'C:\asb\ntnu\MRIscans\250317\dicoms\E') + dcm_names[i]
-        seq_path = str(r'C:\asb\ntnu\MRIscans\250317\seq_files\seq_file_E') + dcm_names[i] + str('.seq')
+        data_path = str(r'C:\asb\ntnu\MRIscans\250312\dicoms\E') + dcm_names[i]
+        seq_path = str(r'C:\asb\ntnu\MRIscans\250312\seq_files\seq_file_E') + dcm_names[i] + str('.seq')
         w, Z_spectrum, MTR_spectrum = EVAL_GluCEST(data_path, seq_path, date)
+        
+        main_path = data_path[-17:-11] + str('_') + data_path[-3:]
 
         plt.axvline(x=3, color='grey', linestyle='--', linewidth=0.8, alpha=0.7)
         plt.xlim([-5, 5])
@@ -222,20 +224,24 @@ if __name__ == "__main__":
         plt.gca().set_aspect(aspect_ratio, adjustable='box')
         
     plt.legend(loc='lower right')
-    plt.show()
+    plot_name = main_path + str("_Z_spectra_recovery_time")
+    my_path = r"c:\asb\ntnu\plotting\auto_save_png\concentrations"
+    save_path = os.path.join(my_path, plot_name + ".png")
+    plt.savefig(save_path, format='png', bbox_inches='tight')
+    #plt.show()
 
     plt.figure(figsize=(5, 5))
     colors = plt.cm.rainbow(np.linspace(0, 1, len(dcm_names)))
     for i in range(len(dcm_names)):
         print(f'Loop: {i+1}')
-        data_path = str(r'C:\asb\ntnu\MRIscans\250317\dicoms\E') + dcm_names[i]
-        seq_path = str(r'C:\asb\ntnu\MRIscans\250317\seq_files\seq_file_E') + dcm_names[i] + str('.seq')
+        data_path = str(r'C:\asb\ntnu\MRIscans\250312\dicoms\E') + dcm_names[i]
+        seq_path = str(r'C:\asb\ntnu\MRIscans\250312\seq_files\seq_file_E') + dcm_names[i] + str('.seq')
         w, Z_spectrum, MTR_spectrum = EVAL_GluCEST(data_path, seq_path, date)
 
         plt.plot(w, MTR_spectrum, marker='o', markersize=2, label=label_names[i], color=colors[i])
         plt.axvline(x=3, color='grey', linestyle='--', linewidth=0.8, alpha=0.7)
         plt.xlim([0, 4])
-        plt.ylim([-0.05,25])
+        plt.ylim([-0.05,20])
         plt.xlabel('Frequency offset Δω [ppm]')
         plt.ylabel('MTRasym [%]')
         plt.gca().invert_xaxis()
@@ -243,9 +249,13 @@ if __name__ == "__main__":
         plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
         # Make axes box square in screen units
         xrange = 4         
-        yrange = 25.05
+        yrange = 20.05
         aspect_ratio = xrange / yrange
         plt.gca().set_aspect(aspect_ratio, adjustable='box')
         
     plt.legend(loc='upper right')
-    plt.show()
+    plot_name = main_path + str("_MTR_spectra_recovery_time")
+    my_path = r"c:\asb\ntnu\plotting\auto_save_png\concentrations"
+    save_path = os.path.join(my_path, plot_name + ".png")
+    plt.savefig(save_path, format='png', bbox_inches='tight')
+    #plt.show()

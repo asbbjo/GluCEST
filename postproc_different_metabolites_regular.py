@@ -113,12 +113,12 @@ def EVAL_GluCEST(data_path, seq_path):
 
     # Choose pixels for ROI
     pixels_dict = { 
-        'glu': [45,50,51,56],     # 250409 & 10
-        'gln': [43,48,70,75],     # 250409 & 10
-        'gaba': [59,64,82,87],    # 250409 & 10
-        'naa': [77,82,73,78],     # 250409 & 10
-        'cr': [79,84,54,59],      # 250409 & 10
-        'taurine': [63,68,43,48], # 250409 & 10
+        'glu 10 mm': [45,50,51,56],     # 250409 & 10
+        'gln 2 mm': [43,48,70,75],     # 250409 & 10
+        'gaba 2 mm': [59,64,82,87],    # 250409 & 10
+        'naa 10 mm': [77,82,73,78],     # 250409 & 10
+        'cr 6 mm': [79,84,54,59],      # 250409 & 10
+        'taurine 2 mm': [63,68,43,48], # 250409 & 10
     }
 
     print('--- Plotting GluCEST images ---')
@@ -135,9 +135,9 @@ def EVAL_GluCEST(data_path, seq_path):
     cb = plt.colorbar(im, cax=cax, format="%.2f")
     cb.set_ticks(np.linspace(vmin, vmax, 5)) 
     ax.set_title("Z(Δω) = %.2f ppm" % w_offset_of_interest)
-    plt.show()
+    #plt.show()
 
-    pixels_glu = pixels_dict.get('taurine')
+    pixels_glu = pixels_dict.get('glu 10 mm')
     array_MTR = V_MTRasym_reshaped[pixels_glu[0]:pixels_glu[1],pixels_glu[2]:pixels_glu[3],slice_of_interest,1:] # 1: to remove the M0 scan
     flattened_vectors_MTR_glu = array_MTR.reshape(-1, array_MTR.shape[-1]) 
 
@@ -149,6 +149,8 @@ def EVAL_GluCEST(data_path, seq_path):
     # Save to text file
     np.savetxt(r'C:\asb\ntnu\master\GluCEST\flattened_Taurine_reg.txt', flatten_glu1, fmt="%.6f")  # or fmt="%d" for integers'''
 
+    main_path = data_path[-16:-10] + str('_') + data_path[-2:]
+
     MTR_max = np.max(flattened_vectors_MTR_glu)
     fig, ax = plt.subplots(figsize=(5, 5)) 
     vmin, vmax = 0, MTR_max # set GluCEST contrast range
@@ -157,11 +159,15 @@ def EVAL_GluCEST(data_path, seq_path):
     cax = divider.append_axes("right", size="5%", pad=0.05)
     cb = plt.colorbar(im, cax=cax, format="%.2f")
     cb.set_ticks(np.linspace(vmin, vmax, 5)) 
-    ax.set_title("MTRasym(Δω) = %.2f ppm" % w_offset_of_interest)
-    plt.show()
+    #ax.set_title("MTRasym(Δω) = %.2f ppm" % w_offset_of_interest)
+    plot_name = main_path + str("_MTR_map")
+    my_path = r"c:\asb\ntnu\plotting\auto_save_png\different"
+    save_path = os.path.join(my_path, plot_name + ".png")
+    plt.savefig(save_path, format='png', bbox_inches='tight')
+    #plt.show()
 
     # Choose metabolites
-    label_names = ['Glu', 'Gln', 'GABA', 'NAA', 'Cr', 'Taurine']
+    label_names = ['Glu 10 mM', 'Gln 2 mM', 'GABA 2 mM', 'NAA 10 mM', 'Cr 6 mM', 'Taurine 2 mM']
     m_avg = []
     m_sem = []
 
@@ -201,7 +207,11 @@ def EVAL_GluCEST(data_path, seq_path):
         plt.gca().set_aspect(aspect_ratio, adjustable='box')
 
     plt.legend(loc='lower right')
-    plt.show()
+    plot_name = main_path + str("_Z_spectra")
+    my_path = r"c:\asb\ntnu\plotting\auto_save_png\different"
+    save_path = os.path.join(my_path, plot_name + ".png")
+    plt.savefig(save_path, format='png', bbox_inches='tight')
+    #plt.show()
 
     plt.figure(figsize=(5, 5))
 
@@ -222,7 +232,7 @@ def EVAL_GluCEST(data_path, seq_path):
         plt.xlabel('Frequency offset Δω [ppm]')
         plt.ylabel('MTRasym [%]')
         plt.gca().invert_xaxis()
-        plt.title("MTRasym-spectra for different metabolites")
+        #plt.title("MTRasym-spectra for different metabolites")
         plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
         # Make axes box square in screen units
         xrange = 4         
@@ -231,12 +241,22 @@ def EVAL_GluCEST(data_path, seq_path):
         plt.gca().set_aspect(aspect_ratio, adjustable='box')
 
     plt.legend(loc='upper right')
-    plt.show()
+    plot_name = main_path + str("_MTR_spectra")
+    my_path = r"c:\asb\ntnu\plotting\auto_save_png\different"
+    save_path = os.path.join(my_path, plot_name + ".png")
+    plt.savefig(save_path, format='png', bbox_inches='tight')
+    #plt.show()
 
     # GluCEST effect for each [conc]
     metabolites = np.arange(len(label_names))
     m_avg = np.array(m_avg)
     m_sem = np.array(m_sem)
+
+    combined = np.concatenate((m_avg, m_sem))
+    plot_name = main_path + str("_MTRasym")
+    my_path = r"c:\asb\ntnu\plotting\auto_save_png\different"
+    save_path = os.path.join(my_path, plot_name + ".txt")
+    np.savetxt(save_path, combined, fmt='%s')
 
     # Plot data with error bars
     plt.figure(figsize=(5, 5))
@@ -248,12 +268,12 @@ def EVAL_GluCEST(data_path, seq_path):
     plt.xticks(metabolites, label_names)
     plt.legend()
     plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
-    plt.show()
+    #plt.show()
     
 
 if __name__ == "__main__":
     globals()["EVAL_GluCEST"] = EVAL_GluCEST 
     EVAL_GluCEST(
-        data_path=r'C:\asb\ntnu\MRIscans\250410\dicoms\E4', 
-        seq_path=r'C:\asb\ntnu\MRIscans\250410\seq_files\seq_file_E4.seq',
+        data_path=r'C:\asb\ntnu\MRIscans\250409\dicoms\E4', 
+        seq_path=r'C:\asb\ntnu\MRIscans\250409\seq_files\seq_file_E4.seq',
     )

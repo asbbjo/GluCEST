@@ -184,14 +184,14 @@ def EVAL_GluCEST(data_path, seq_path, date):
 if __name__ == "__main__":
 
     # 250312
-    '''dcm_names = np.array(['23','28','29','30','32','33','34'])
+    dcm_names = np.array(['23','28','29','30','32','33','34'])
     label_names = ['10e-6s', '1s', '2s', '3s', '4s', '6s', '10s']
-    title = str("Linear trends with recovery times")'''
+    title = str("Linear trends with recovery times")
 
     # 250313
-    dcm_names = np.array(['12','13','14','15','16'])
+    '''dcm_names = np.array(['12','13','14','15','16'])
     label_names = ['1 μT', '2 μT', '3 μT', '4 μT', '5 μT']
-    title = str("Linear trends with saturation power")
+    title = str("Linear trends with saturation power")'''
 
     # 250317
     '''dcm_names = np.array(['22','24','14','23','25'])
@@ -217,14 +217,15 @@ if __name__ == "__main__":
 
     plt.figure(figsize=(5, 5))
     colors = plt.cm.rainbow(np.linspace(0, 1, len(dcm_names)))
+    r2_list = []
 
-    date = '250313'
+    date = '250312'
     print(date)
-    input('Correct path for you acquisitions?\n')
+    input('Correct path for you acquisitions? CHECK PATH FOR SAVING IMAGE\n')
     for i in range(len(dcm_names)):
         print(f'Loop: {i+1}')
-        data_path = str(r'C:\asb\ntnu\MRIscans\250313\dicoms\E') + dcm_names[i]
-        seq_path = str(r'C:\asb\ntnu\MRIscans\250313\seq_files\seq_file_E') + dcm_names[i] + str('.seq')
+        data_path = str(r'C:\asb\ntnu\MRIscans\250312\dicoms\E') + dcm_names[i]
+        seq_path = str(r'C:\asb\ntnu\MRIscans\250312\seq_files\seq_file_E') + dcm_names[i] + str('.seq')
         mm, mm_avg, mm_sem = EVAL_GluCEST(data_path, seq_path, date)
 
         # Fit a linear trend line
@@ -241,7 +242,8 @@ if __name__ == "__main__":
 
         # Calculate R²
         r2 = r2_score(mm_avg, y_pred)
-        print(f"R²: {r2:.4f}")
+        r2_list.append(r2)
+        #print(f"R²: {r2:.4f}")
         
         
         # Plot data with error bars
@@ -257,7 +259,15 @@ if __name__ == "__main__":
         yrange = 22
         aspect_ratio = xrange / yrange
         plt.gca().set_aspect(aspect_ratio, adjustable='box')
-        plt.title(title)
+        #plt.title(title)
         plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
         plt.legend()
-    plt.show()
+
+    plot_name = str("linearities_recovery_times")
+    my_path = r"c:\asb\ntnu\plotting\auto_save_png\concentrations"
+    save_path = os.path.join(my_path, plot_name + ".png")
+    plt.savefig(save_path, format='png')
+
+    save_path = os.path.join(my_path, plot_name + ".txt")
+    np.savetxt(save_path, np.array(r2_list), fmt='%s')
+    #plt.show()

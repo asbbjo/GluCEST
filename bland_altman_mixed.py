@@ -75,27 +75,32 @@ print(mean_diff, 1.96*std_diff)
 # Labels and styling
 plt.xlabel('Mean gluCEST effect [%]')
 plt.ylabel('Difference of gluCEST effect [%]')
-plt.title('Comparison of the regular and the optimized offset list')
+#plt.title('Comparison of the regular and the optimized offset list')
 plt.ylim([-0.025, 0.015])
 plt.gca().xaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f'{x:.0f}'))
-plt.ylim([-2.5, 1.5])
+plt.ylim([-2.5, 2.5])
 
 # Create a dummy legend
 from matplotlib.lines import Line2D
 legend_elements = [
-    Line2D([0], [0], marker='o', color='w', label='Glu+Gln', markerfacecolor='red', markersize=6),
-    Line2D([0], [0], marker='o', color='w', label='Glu+GABA', markerfacecolor='blue', markersize=6),
+    Line2D([0], [0], marker='o', color='w', label='Glu+Gln', markerfacecolor='red', markersize=6, alpha=0.3),
+    Line2D([0], [0], marker='o', color='w', label='Glu+GABA', markerfacecolor='blue', markersize=6, alpha=0.3),
     Line2D([], [], color='black', linestyle='--', label='Mean difference'),
     Line2D([], [], color='gray', linestyle='--', label='±1.96 SD'),
 ]
 plt.legend(handles=legend_elements)
 
-# Aspect ratio and grid
-'''xrange = 0.018         
-yrange = 0.04
-aspect_ratio = xrange / yrange
-plt.gca().set_aspect(aspect_ratio, adjustable='box')'''
-plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
+import os
 
+# Aspect ratio and grid
+xrange = 13       
+yrange = 5
+aspect_ratio = xrange / yrange
+plt.gca().set_aspect(aspect_ratio, adjustable='box')
+plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
+plot_name = str("Bland_Altman_mixed")
+my_path = r"c:\asb\ntnu\plotting\auto_save_png"
+save_path = os.path.join(my_path, plot_name + ".png")
+plt.savefig(save_path, format='png', bbox_inches='tight')
 # Show
 plt.show()
