@@ -17,13 +17,13 @@ import scipy as sc
 # Set general IEEE-style parameters
 plt.rcParams.update({
     "text.usetex": False,  # Set to True if you have LaTeX installed
-    "font.family": "serif",
-    "font.size": 14,  # IEEE column text is usually around 8-9 pt
-    "axes.labelsize": 7,
-    "axes.titlesize": 7,
-    "legend.fontsize": 6,
-    "xtick.labelsize": 6,
-    "ytick.labelsize": 6,
+    "font.size": 10,  # IEEE column text is usually around 8-9 pt
+    "font.family": 'serif',
+    "axes.labelsize": 15,
+    "axes.titlesize": 1,
+    "legend.fontsize": 9,
+    "xtick.labelsize": 8,
+    "ytick.labelsize": 8,
     "lines.linewidth": 1,
     "lines.markersize": 4,
     "figure.dpi": 250,
@@ -113,12 +113,12 @@ def EVAL_GluCEST(data_path, seq_path):
 
     # Choose pixels for ROI
     pixels_dict = { 
-        '10glu 2gln': [76,81,75,80],    # 250410
-        '6glu 2gln': [57,62,83,88],     # 250410
-        '2glu 2gln': [42,47,70,75],     # 250410
-        '10glu 2gaba': [46,51,51,56],   # 250410
-        '6glu 2gaba': [64,69,44,49],    # 250410
-        '2glu 2gaba': [79,84,56,61],    # 250410
+        'glu10mm+gln': [76,81,75,80],    # 250410
+        'glu6mm+gln': [57,62,83,88],     # 250410
+        'glu2mm+gln': [42,47,70,75],     # 250410
+        'glu10mm+gaba': [46,51,51,56],   # 250410
+        'glu6mm+gaba': [64,69,44,49],    # 250410
+        'glu2mm+gaba': [79,84,56,61],    # 250410
     }
 
     print('--- Plotting GluCEST images ---')
@@ -137,11 +137,11 @@ def EVAL_GluCEST(data_path, seq_path):
     ax.set_title("Z(Δω) = %.2f ppm" % w_offset_of_interest)
     #plt.show()
 
-    pixels_glu1 = pixels_dict.get('2glu 2gln')
+    pixels_glu1 = pixels_dict.get('glu10mm+gln')
     array_MTR1 = V_MTRasym_reshaped[pixels_glu1[0]:pixels_glu1[1],pixels_glu1[2]:pixels_glu1[3],slice_of_interest,1:] # 1: to remove the M0 scan
     flattened_vectors_MTR_glu1 = array_MTR1.reshape(-1, array_MTR1.shape[-1]) 
 
-    pixels_glu2 = pixels_dict.get('2glu 2gaba')
+    pixels_glu2 = pixels_dict.get('glu2mm+gaba')
     array_MTR2 = V_MTRasym_reshaped[pixels_glu2[0]:pixels_glu2[1],pixels_glu2[2]:pixels_glu2[3],slice_of_interest,1:] # 1: to remove the M0 scan
     flattened_vectors_MTR_glu2 = array_MTR2.reshape(-1, array_MTR2.shape[-1]) 
 
@@ -170,14 +170,14 @@ def EVAL_GluCEST(data_path, seq_path):
     cb = plt.colorbar(im, cax=cax, format="%.2f")
     cb.set_ticks(np.linspace(vmin, vmax, 5)) 
     #ax.set_title("MTRasym(Δω) = %.2f ppm" % w_offset_of_interest)
-    plot_name = main_path + str("_MTR_map")
-    my_path = r"c:\asb\ntnu\plotting\auto_save_png\mixed"
-    save_path = os.path.join(my_path, plot_name + ".png")
-    plt.savefig(save_path, format='png', bbox_inches='tight')
+    plot_name = main_path + str("_MTR_map_reg")
+    my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf\mixed"
+    save_path = os.path.join(my_path, plot_name + ".pdf")
+    plt.savefig(save_path, format='pdf', bbox_inches='tight')
     #plt.show()
 
     # Choose metabolites
-    label_names = ['10Glu 2Gln', '6Glu 2Gln', '2Glu 2Gln', '10Glu 2GABA', '6Glu 2GABA', '2Glu 2GABA']
+    label_names = ['Glu10mM+Gln', 'Glu6mM+Gln', 'Glu2mM+Gln', 'Glu10mM+GABA', 'Glu6mM+GABA', 'Glu2mM+GABA']
     m_avg = []
     m_sem = []
 
@@ -205,7 +205,7 @@ def EVAL_GluCEST(data_path, seq_path):
         plt.xlim([-5, 5])
         plt.ylim([0.12,1.1])
         plt.plot(w, Z_spectrum, marker='o', markersize=2, label=label_names[i], color=colors[i])
-        plt.xlabel('Frequency offset Δω [ppm]')
+        plt.xlabel('Δω [ppm]')
         plt.ylabel(r'$S_{\mathrm{sat}}/S_{\mathrm{0}}$')
         plt.gca().invert_xaxis()
         plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
@@ -217,10 +217,10 @@ def EVAL_GluCEST(data_path, seq_path):
         plt.gca().set_aspect(aspect_ratio, adjustable='box')
 
     plt.legend(loc='lower right')
-    plot_name = main_path + str("_Z_spectra")
-    my_path = r"c:\asb\ntnu\plotting\auto_save_png\mixed"
-    save_path = os.path.join(my_path, plot_name + ".png")
-    plt.savefig(save_path, format='png', bbox_inches='tight')
+    plot_name = main_path + str("_Z_spectra_reg")
+    my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf\mixed"
+    save_path = os.path.join(my_path, plot_name + ".pdf")
+    plt.savefig(save_path, format='pdf', bbox_inches='tight')
     #plt.show()
 
     plt.figure(figsize=(5, 5))
@@ -239,7 +239,7 @@ def EVAL_GluCEST(data_path, seq_path):
         plt.axvline(x=3, color='grey', linestyle='--', linewidth=0.8, alpha=0.7)
         plt.xlim([0, 4])
         plt.ylim([-0.05,18])
-        plt.xlabel('Frequency offset Δω [ppm]')
+        plt.xlabel('Δω [ppm]')
         plt.ylabel('MTRasym [%]')
         plt.gca().invert_xaxis()
         #plt.title("MTRasym-spectra for mixed metabolites")
@@ -251,10 +251,10 @@ def EVAL_GluCEST(data_path, seq_path):
         plt.gca().set_aspect(aspect_ratio, adjustable='box')
 
     plt.legend(loc='upper right')
-    plot_name = main_path + str("_MTR_spectra")
-    my_path = r"c:\asb\ntnu\plotting\auto_save_png\mixed"
-    save_path = os.path.join(my_path, plot_name + ".png")
-    plt.savefig(save_path, format='png', bbox_inches='tight')
+    plot_name = main_path + str("_MTR_spectra_reg")
+    my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf\mixed"
+    save_path = os.path.join(my_path, plot_name + ".pdf")
+    plt.savefig(save_path, format='pdf', bbox_inches='tight')
     #plt.show()
 
     # GluCEST effect for each [Glu]
@@ -262,11 +262,11 @@ def EVAL_GluCEST(data_path, seq_path):
     m_avg = np.array(m_avg)
     m_sem = np.array(m_sem)
 
-    combined = np.concatenate((m_avg, m_sem))
+    '''combined = np.concatenate((m_avg, m_sem))
     plot_name = main_path + str("_MTRasym")
     my_path = r"c:\asb\ntnu\plotting\auto_save_png\mixed"
     save_path = os.path.join(my_path, plot_name + ".txt")
-    np.savetxt(save_path, combined, fmt='%s')
+    np.savetxt(save_path, combined, fmt='%s')'''
 
     # Plot data with error bars
     print('--- Plotting GluCEST effect ---')

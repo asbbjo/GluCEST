@@ -17,11 +17,11 @@ import scipy as sc
 # Set general IEEE-style parameters
 plt.rcParams.update({
     "text.usetex": False,  # Set to True if you have LaTeX installed
-    "font.family": "serif",
-    "font.size": 14,  # IEEE column text is usually around 8-9 pt
-    "axes.labelsize": 8,
-    "axes.titlesize": 8,
-    "legend.fontsize": 7,
+    "font.size": 10,  # IEEE column text is usually around 8-9 pt
+    "font.family": 'serif',
+    "axes.labelsize": 10,
+    "axes.titlesize": 1,
+    "legend.fontsize": 9,
     "xtick.labelsize": 7,
     "ytick.labelsize": 7,
     "lines.linewidth": 1,
@@ -62,25 +62,25 @@ def EVAL_GluCEST(data_path, seq_path, date):
     sz = V.shape
     V = np.reshape(V, [sz[0], sz[1], n_meas, sz[2] // n_meas]).transpose(0, 1, 3, 2)
 
-    '''image_to_plot = V[:, :, 0, 0]
+    '''image_to_plot = V[:, :, 0, 40]
     # Create figure and axis
     fig, ax = plt.subplots(figsize=(5, 5))
-    ax.imshow(image_to_plot, cmap='gray')
-    import matplotlib.patches as patches
+    ax.imshow(image_to_plot, cmap='gray')'''
+    '''import matplotlib.patches as patches
     # Define center and radius
     center_x, center_y = 65, 61  # center of 128x128
     radius = 32
 
     # Create and add circle
-    circle = patches.Circle((center_x, center_y), radius, linewidth=1.5, edgecolor='lime', facecolor='none', alpha=0.6)
-    ax.add_patch(circle)
+    circle = patches.Circle((center_x, center_y), radius, linewidth=1.5, edgecolor='lime', facecolor='none', alpha=0.8)
+    ax.add_patch(circle)'''
 
-    #plt.title(f'DICOM Slice: frame {0}, measurement {15}')
-    my_path = r"c:\asb\ntnu\plotting\auto_save_png\concentrations"
-    plot_name = str("raw_CEST_image_shimming")
-    save_path = os.path.join(my_path, plot_name + ".png")
-    plt.savefig(save_path, format='png', bbox_inches='tight')
-    plt.show() #plot a DICOM '''
+    '''#plt.title(f'DICOM Slice: frame {0}, measurement {15}')
+    my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf"
+    plot_name = str("raw_CEST_image_3ppm")
+    save_path = os.path.join(my_path, plot_name + ".pdf")
+    plt.savefig(save_path, format='pdf', bbox_inches='tight')
+    plt.show() #plot a DICOM'''
 
     # Vectorization
     threshold = 100 #np.max(V)*0.1 # threshold of 10%
@@ -205,6 +205,14 @@ def EVAL_GluCEST(data_path, seq_path, date):
     offset_of_interest = np.where(offsets == desired_offset)[0]  
     w_offset_of_interest = offsets[offset_of_interest]
 
+    # For Bland Altman plotting
+    '''glu1 = V_MTRasym_reshaped[pixels_10mm[0]:pixels_10mm[1],pixels_10mm[2]:pixels_10mm[3],slice_of_interest,offset_of_interest]
+
+    flatten_glu1 = glu1.flatten()
+
+    # Save to text file
+    np.savetxt(r'C:\asb\ntnu\master\GluCEST\flattened_11_10mm.txt', flatten_glu1, fmt="%.6f")  # or fmt="%d" for integers'''
+
     fig, ax = plt.subplots(figsize=(5, 5), constrained_layout=True) 
     vmin, vmax = 0.5, 1  # Z-spectra range
     im = ax.imshow(V_Z_corr_reshaped[:, :, slice_of_interest, offset_of_interest],vmin=vmin, vmax=vmax, cmap='rainbow')
@@ -219,25 +227,25 @@ def EVAL_GluCEST(data_path, seq_path, date):
 
     MTR_max = np.max(flattened_vectors_MTR)/100
     fig, ax = plt.subplots(figsize=(5, 5), constrained_layout=True) 
-    vmin, vmax = 0, 0.22 # set GluCEST contrast range (0.22 for pulse parameter gluCEST maps)
+    vmin, vmax = 0, 0.14 # set GluCEST contrast range (0.22 for pulse parameter gluCEST maps)
     im = ax.imshow(V_MTRasym_reshaped[:,:,slice_of_interest,offset_of_interest], vmin=vmin, vmax=vmax, cmap='OrRd')
     divider = make_axes_locatable(ax)
     cax = divider.append_axes("right", size="5%", pad=0.05)
     cb = plt.colorbar(im, cax=cax, format="%.2f")
     cb.set_ticks(np.linspace(vmin, vmax, 5)) 
     #ax.set_title("MTRasym(Δω) = %.2f ppm" % w_offset_of_interest)
-    plot_name = main_path + str("_MTR_map_10mM")
-    my_path = r"c:\asb\ntnu\plotting\auto_save_png\concentrations"
-    save_path = os.path.join(my_path, plot_name + ".png")
-    plt.savefig(save_path, format='png', bbox_inches='tight')
+    plot_name = main_path + str("_MTR_map")
+    my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf\concentrations"
+    save_path = os.path.join(my_path, plot_name + ".pdf")
+    plt.savefig(save_path, format='pdf', bbox_inches='tight')
     #plt.show()
     
     plt.figure(figsize=(5, 5), constrained_layout=True)
     plt.axvline(x=3, color='grey', linestyle='--', linewidth=0.8, alpha=0.7)
-    plt.xlim([-5, 5])
+    plt.xlim([-5, 5]) 
     plt.ylim([0.12,1.1])
-    plt.plot(w, Z_spectrum, "r.-")
-    plt.xlabel('Frequency offset Δω [ppm]')
+    plt.plot(w, Z_spectrum, color='darkblue')
+    plt.xlabel('Δω [ppm]')
     plt.ylabel(r'$S_{\mathrm{sat}}/S_{\mathrm{0}}$')
     plt.gca().invert_xaxis()
     plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
@@ -247,31 +255,31 @@ def EVAL_GluCEST(data_path, seq_path, date):
     yrange = 1.1 - 0.12
     aspect_ratio = xrange / yrange
     plt.gca().set_aspect(aspect_ratio, adjustable='box')
-    plot_name = main_path + str("_Z_spectra_10mM")
-    my_path = r"c:\asb\ntnu\plotting\auto_save_png\concentrations"
-    save_path = os.path.join(my_path, plot_name + ".png")
-    #plt.savefig(save_path, format='png')
+    plot_name = main_path + str("_z_spectra")
+    my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf\concentrations"
+    save_path = os.path.join(my_path, plot_name + ".pdf")
+    plt.savefig(save_path, format='pdf')
     #plt.show()
 
     plt.figure(figsize=(5, 5), constrained_layout=True)
-    plt.plot(w, MTR_spectrum, "b.-")
+    plt.plot(w, MTR_spectrum, color='royalblue')
     plt.axvline(x=3, color='grey', linestyle='--', linewidth=0.8, alpha=0.7)
     plt.xlim([0, 4])
-    plt.ylim([-0.05,22])
-    plt.xlabel('Frequency offset Δω [ppm]')
+    plt.ylim([-0.05,14])
+    plt.xlabel('Δω [ppm]')
     plt.ylabel('MTRasym [%]')
     plt.gca().invert_xaxis()
-    plt.title("Mean MTRasym-spectrum for 10mM")
+    #plt.title("Mean MTRasym-spectrum for 10mM")
     plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
     # Make axes box square in screen units
     xrange = 4         
-    yrange = 22.05
+    yrange = 14.05
     aspect_ratio = xrange / yrange
     plt.gca().set_aspect(aspect_ratio, adjustable='box')
-    plot_name = main_path + str("_MTR_spectra_10mM")
-    my_path = r"c:\asb\ntnu\plotting\auto_save_png\concentrations"
-    save_path = os.path.join(my_path, plot_name + ".png")
-    #plt.savefig(save_path, format='png')
+    plot_name = main_path + str("_mtr_spectra")
+    my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf\concentrations"
+    save_path = os.path.join(my_path, plot_name + ".pdf")
+    plt.savefig(save_path, format='pdf')
     #plt.show()
 
     # GluCEST effect for each [Glu]
@@ -300,9 +308,11 @@ def EVAL_GluCEST(data_path, seq_path, date):
 
     combined = np.concatenate((mm_avg, mm_sem))
     plot_name = main_path + str("_MTRasym")
-    my_path = r"c:\asb\ntnu\plotting\auto_save_png\concentrations"
+    my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf\concentrations"
     save_path = os.path.join(my_path, plot_name + ".txt")
     np.savetxt(save_path, combined, fmt='%s')
+
+    plt.figure(figsize=(6, 5))
 
     # Plot data with error bars
     plt.errorbar(mm, mm_avg, yerr=mm_sem, fmt='o', label="Averages of data with SEM", capsize=6)
@@ -312,18 +322,22 @@ def EVAL_GluCEST(data_path, seq_path, date):
     trend_line = slope * mm + intercept  
 
     plt.plot(mm, trend_line, 'r--', label=f"Trend: y={slope:.2f}x + {intercept:.2f}")
-    plt.xlabel("Concentration of Glu [mM]")
-    plt.ylabel("MTRasym contrast [%]")
-    plt.title("Linear trend with concentrations")
+    plt.xlabel("Concentration [mM]")
+    plt.ylabel("gluCEST [%]")
+    plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
+    #plt.title("Linear trend with concentrations")
     plt.legend()
-    '''plt.grid(True)'''
+    plot_name = main_path + str("_linearities")
+    my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf\concentrations"
+    save_path = os.path.join(my_path, plot_name + ".pdf")
+    plt.savefig(save_path, format='pdf')
     #plt.show()
     
 
 if __name__ == "__main__":
     globals()["EVAL_GluCEST"] = EVAL_GluCEST 
     EVAL_GluCEST(
-        data_path=r'C:\asb\ntnu\MRIscans\250317\dicoms\E22', 
-        seq_path=r'C:\asb\ntnu\MRIscans\250317\seq_files\seq_file_E22.seq',
-        date = '250317'
+        data_path=r'C:\asb\ntnu\MRIscans\250408\dicoms\E11', 
+        seq_path=r'C:\asb\ntnu\MRIscans\250408\seq_files\seq_file_E11.seq',
+        date = '250408'
     )

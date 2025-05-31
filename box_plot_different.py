@@ -37,76 +37,49 @@ metab_colors = {
     'Taurine': 'brown',
 }
 
-# Prepare containers
-all_means = []
-all_diffs = []
-colors = []
+# Prepare box plot data
+boxplot_data = []
+boxplot_labels = []
 
-# Loop through all dataset pairs
+# Loop through all dataset pairs again for boxplot
 for regular_path, optimized_path, label in datasets:
-    reg = np.loadtxt(regular_path)
-    opt = np.loadtxt(optimized_path)
-    
-    mean = ((reg + opt) / 2) * 100
-    diff = (reg - opt) * 100
-    
-    all_means.append(mean)
-    all_diffs.append(diff)
-    
-    color = metab_colors.get(label, 'black')  # fallback to black if not found
-    colors.extend([color] * len(mean))
+    reg = np.loadtxt(regular_path) * 100
+    opt = np.loadtxt(optimized_path) * 100
 
-# Concatenate all data
-all_means = np.concatenate(all_means)
-all_diffs = np.concatenate(all_diffs)
+    boxplot_data.append(reg)
+    boxplot_labels.append(f'{label}_reg')
 
-# Statistics
-mean_diff = np.mean(all_diffs)
-std_diff = np.std(all_diffs)
+    boxplot_data.append(opt)
+    boxplot_labels.append(f'{label}_opt')
 
-# Create plot
+# Plot
 plt.figure(figsize=(6, 6))
+box = plt.boxplot(boxplot_data, patch_artist=True)
 
-# Scatter plot with colors
-for mean_val, diff_val, c in zip(all_means, all_diffs, colors):
-    plt.scatter(mean_val, diff_val, color=c, alpha=0.3, s=10)
+# Color the boxes based on the metabolite
+for patch, label in zip(box['boxes'], boxplot_labels):
+    metab = label.split('_')[0]
+    patch.set_facecolor(metab_colors.get(metab, 'gray'))
+    patch.set_alpha(0.5)
 
-# Add statistical lines
-plt.axhline(mean_diff, color='black', linestyle='--', label='Mean difference')
-plt.axhline(mean_diff + 1.96 * std_diff, color='gray', linestyle='--', label='±1.96 SD')
-plt.axhline(mean_diff - 1.96 * std_diff, color='gray', linestyle='--')
-print(mean_diff, std_diff*1.96)
+# Customizing the plot
+plt.xticks(ticks=np.arange(1, len(boxplot_labels) + 1), labels=boxplot_labels, rotation=45)
+plt.ylabel('gluCEST effect [%]')
+#plt.title('Distribution of gluCEST effect for regular vs optimized offset lists')
 
-# Labels and title
-plt.xlabel('Mean gluCEST effect [%]')
-plt.ylabel('Difference of gluCEST effect [%]')
-#plt.title('Comparison of the regular and the optimized offset list')
-
-# Axis formatting
-plt.ylim([-2, 3])
-plt.gca().xaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f'{x:.0f}'))
-
-# Custom legend for metabolites
-legend_elements = [
-    Line2D([0], [0], marker='o', color='w', label=metab,
-           markerfacecolor=color, markersize=6, alpha=0.3)
-    for metab, color in metab_colors.items()
-]
-legend_elements.append(Line2D([], [], color='black', linestyle='--', label='Mean difference'))
-legend_elements.append(Line2D([], [], color='gray', linestyle='--', label='±1.96 SD'))
-
-plt.legend(handles=legend_elements, loc='upper right')
-
-xrange = 10         
-yrange = 5
+# Optional: Add grid
+plt.grid(axis='y', linestyle='--', alpha=0.6)
+xrange = 12         
+yrange = 12
 aspect_ratio = xrange / yrange
 plt.gca().set_aspect(aspect_ratio, adjustable='box')
+
 
 import os 
 
 # Grid and layout
 plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
-plot_name = str("Bland_Altman_different")
+plot_name = str("box_plot_different")
 my_path = r"c:\asb\ntnu\plotting\auto_save_png"
 save_path = os.path.join(my_path, plot_name + ".png")
 plt.savefig(save_path, format='png', bbox_inches='tight')

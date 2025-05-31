@@ -16,13 +16,13 @@ import scipy as sc
 # Set general IEEE-style parameters
 plt.rcParams.update({
     "text.usetex": False,  # Set to True if you have LaTeX installed
-    "font.family": "serif",
-    "font.size": 14,  # IEEE column text is usually around 8-9 pt
-    "axes.labelsize": 7,
-    "axes.titlesize": 7,
-    "legend.fontsize": 6,
-    "xtick.labelsize": 6,
-    "ytick.labelsize": 6,
+    "font.size": 10,  # IEEE column text is usually around 8-9 pt
+    "font.family": 'serif',
+    "axes.labelsize": 15,
+    "axes.titlesize": 1,
+    "legend.fontsize": 10,
+    "xtick.labelsize": 9,
+    "ytick.labelsize": 9,
     "lines.linewidth": 1,
     "lines.markersize": 4,
     "figure.dpi": 250,
@@ -170,16 +170,16 @@ def EVAL_GluCEST(data_path, seq_path, date):
 if __name__ == "__main__":
 
     # 250312
-    dcm_names = np.array(['23','28','29','30','32','33','34'])
-    label_names = ['10e-6s', '1s', '2s', '3s', '4s', '6s', '10s']
+    '''dcm_names = np.array(['23','28','29','30','32','33','34'])
+    label_names = ['10⁻⁶ s', '1 s', '2 s', '3 s', '4 s', '6 s', '10 s']'''
 
     # 250313
     '''dcm_names = np.array(['12','13','14','15','16'])
     label_names = ['1 μT', '2 μT', '3 μT', '4 μT', '5 μT']'''
 
     # 250317
-    '''dcm_names = np.array(['22','24','14','23','25'])
-    label_names = ['15ms', '30ms', '50ms', '100ms', '300ms'] # Different ROI for E14'''
+    dcm_names = np.array(['22','24','14','23','25'])
+    label_names = ['15 ms', '30 ms', '50 ms', '100 ms', '300 ms'] # Different ROI for E14'''
 
     # 250324
     '''#dcm_names = np.array(['10','11','12','13','14','15'])
@@ -197,13 +197,13 @@ if __name__ == "__main__":
     plt.figure(figsize=(5, 5))
     colors = plt.cm.rainbow(np.linspace(0, 1, len(dcm_names)))
 
-    date = '250312'
+    date = '250317'
     print(date)
     input('Correct path for you acquisitions? Correct title of the plots?\n')
     for i in range(len(dcm_names)):
         print(f'Loop: {i+1}')
-        data_path = str(r'C:\asb\ntnu\MRIscans\250312\dicoms\E') + dcm_names[i]
-        seq_path = str(r'C:\asb\ntnu\MRIscans\250312\seq_files\seq_file_E') + dcm_names[i] + str('.seq')
+        data_path = str(r'C:\asb\ntnu\MRIscans\250317\dicoms\E') + dcm_names[i]
+        seq_path = str(r'C:\asb\ntnu\MRIscans\250317\seq_files\seq_file_E') + dcm_names[i] + str('.seq')
         w, Z_spectrum, MTR_spectrum = EVAL_GluCEST(data_path, seq_path, date)
         
         main_path = data_path[-17:-11] + str('_') + data_path[-3:]
@@ -212,7 +212,7 @@ if __name__ == "__main__":
         plt.xlim([-5, 5])
         plt.ylim([0.12,1.1])
         plt.plot(w, Z_spectrum, marker='o', markersize=2, label=label_names[i], color=colors[i])
-        plt.xlabel('Frequency offset Δω [ppm]')
+        plt.xlabel('Δω [ppm]')
         plt.ylabel(r'$S_{\mathrm{sat}}/S_{\mathrm{0}}$')
         plt.gca().invert_xaxis()
         plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
@@ -224,38 +224,50 @@ if __name__ == "__main__":
         plt.gca().set_aspect(aspect_ratio, adjustable='box')
         
     plt.legend(loc='lower right')
-    plot_name = main_path + str("_Z_spectra_recovery_time")
-    my_path = r"c:\asb\ntnu\plotting\auto_save_png\concentrations"
-    save_path = os.path.join(my_path, plot_name + ".png")
-    plt.savefig(save_path, format='png', bbox_inches='tight')
+    plot_name = main_path + str("_Z_spectra_pulse_length")
+    my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf\pulseparameters"
+    save_path = os.path.join(my_path, plot_name + ".pdf")
+    plt.savefig(save_path, format='pdf', bbox_inches='tight')
     #plt.show()
+
+    mtr = []
 
     plt.figure(figsize=(5, 5))
     colors = plt.cm.rainbow(np.linspace(0, 1, len(dcm_names)))
     for i in range(len(dcm_names)):
         print(f'Loop: {i+1}')
-        data_path = str(r'C:\asb\ntnu\MRIscans\250312\dicoms\E') + dcm_names[i]
-        seq_path = str(r'C:\asb\ntnu\MRIscans\250312\seq_files\seq_file_E') + dcm_names[i] + str('.seq')
+        data_path = str(r'C:\asb\ntnu\MRIscans\250317\dicoms\E') + dcm_names[i]
+        seq_path = str(r'C:\asb\ntnu\MRIscans\250317\seq_files\seq_file_E') + dcm_names[i] + str('.seq')
         w, Z_spectrum, MTR_spectrum = EVAL_GluCEST(data_path, seq_path, date)
+
+        mtr.append(MTR_spectrum[40])
 
         plt.plot(w, MTR_spectrum, marker='o', markersize=2, label=label_names[i], color=colors[i])
         plt.axvline(x=3, color='grey', linestyle='--', linewidth=0.8, alpha=0.7)
         plt.xlim([0, 4])
-        plt.ylim([-0.05,20])
-        plt.xlabel('Frequency offset Δω [ppm]')
+        plt.ylim([-0.05,17])
+        plt.xlabel('Δω [ppm]')
         plt.ylabel('MTRasym [%]')
         plt.gca().invert_xaxis()
         #plt.title("MTRasym-spectra for different pulse lengths")
         plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
         # Make axes box square in screen units
         xrange = 4         
-        yrange = 20.05
+        yrange = 17.05
         aspect_ratio = xrange / yrange
         plt.gca().set_aspect(aspect_ratio, adjustable='box')
+
+    '''mm = np.array([np.mean(mtr), sc.stats.sem(mtr)])
+    plot_name = str("_MTR_pulse_length_250317")
+    my_path = r"c:\asb\ntnu\plotting\auto_save_png\concentrations"
+    save_path = os.path.join(my_path, plot_name + ".txt")
+    np.savetxt(save_path, mm, fmt='%s')
+
+    input()'''
         
     plt.legend(loc='upper right')
-    plot_name = main_path + str("_MTR_spectra_recovery_time")
-    my_path = r"c:\asb\ntnu\plotting\auto_save_png\concentrations"
-    save_path = os.path.join(my_path, plot_name + ".png")
-    plt.savefig(save_path, format='png', bbox_inches='tight')
+    plot_name = main_path + str("_MTR_spectra_pulse_length")
+    my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf\pulseparameters"
+    save_path = os.path.join(my_path, plot_name + ".pdf")
+    plt.savefig(save_path, format='pdf', bbox_inches='tight')
     #plt.show()

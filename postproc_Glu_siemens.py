@@ -17,16 +17,16 @@ import scipy as sc
 # Set general IEEE-style parameters
 plt.rcParams.update({
     "text.usetex": False,  # Set to True if you have LaTeX installed
-    "font.family": "serif",
-    "font.size": 14,  # IEEE column text is usually around 8-9 pt
-    "axes.labelsize": 8,
-    "axes.titlesize": 8,
-    "legend.fontsize": 7,
+    "font.size": 10,  # IEEE column text is usually around 8-9 pt
+    "font.family": 'serif',
+    "axes.labelsize": 10,
+    "axes.titlesize": 1,
+    "legend.fontsize": 9,
     "xtick.labelsize": 7,
     "ytick.labelsize": 7,
     "lines.linewidth": 1,
     "lines.markersize": 4,
-    "figure.dpi": 300,
+    "figure.dpi": 250,
 })
 
 def ppval(p, x):
@@ -153,6 +153,8 @@ def EVAL_GluCEST(data_path, seq_path, date):
     flattened_vectors_MTR = array_MTR.reshape(-1, array_MTR.shape[-1]) 
     MTR_spectrum = flattened_vectors_MTR.mean(axis=0)
 
+    main_path = data_path[-6:]
+
     print('--- Plotting ---')
     slice_of_interest = 0 # pick slice for evaluation (0 if only one slice)
     desired_offset = 3 # pick offset for evaluation (3 for GluCEST at 3 ppm)
@@ -161,7 +163,7 @@ def EVAL_GluCEST(data_path, seq_path, date):
 
     fig, ax = plt.subplots(figsize=(5, 5), constrained_layout=True) 
     vmin, vmax = 0.5, 1  # Z-spectra range
-    im = ax.imshow(V_Z_corr_reshaped[:, :, slice_of_interest, offset_of_interest],vmin=vmin, vmax=vmax, cmap='rainbow')
+    im = ax.imshow(V_Z_corr_reshaped[324:428, 157:267, slice_of_interest, offset_of_interest],vmin=vmin, vmax=vmax, cmap='rainbow')
     divider = make_axes_locatable(ax)
     cax = divider.append_axes("right", size="5%", pad=0.05)
     cb = plt.colorbar(im, cax=cax, format="%.2f")
@@ -169,15 +171,25 @@ def EVAL_GluCEST(data_path, seq_path, date):
     ax.set_title("Z(Δω) = %.2f ppm" % w_offset_of_interest)
     plt.show()
 
+    image_gluCEST = V_MTRasym_reshaped[324:428,157:267,slice_of_interest,offset_of_interest]
+    V_mirrored = np.fliplr(image_gluCEST)
+
+    # Rotate 90° clockwise
+    V_rotated = np.rot90(V_mirrored, k=-1)
+
     MTR_max = np.max(flattened_vectors_MTR)/100
     fig, ax = plt.subplots(figsize=(5, 5), constrained_layout=True) 
-    vmin, vmax = 0, MTR_max # set GluCEST contrast range
-    im = ax.imshow(V_MTRasym_reshaped[:,:,slice_of_interest,offset_of_interest], vmin=vmin, vmax=vmax, cmap='OrRd')
+    vmin, vmax = 0, 0.10 # set GluCEST contrast range
+    im = ax.imshow(V_rotated, vmin=vmin, vmax=vmax, cmap='OrRd')
     divider = make_axes_locatable(ax)
     cax = divider.append_axes("right", size="5%", pad=0.05)
     cb = plt.colorbar(im, cax=cax, format="%.2f")
     cb.set_ticks(np.linspace(vmin, vmax, 5)) 
-    ax.set_title("MTRasym(Δω) = %.2f ppm" % w_offset_of_interest)
+    #ax.set_title("MTRasym(Δω) = %.2f ppm" % w_offset_of_interest)
+    plot_name = main_path + str("_MTR_map")
+    my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf\concentrations"
+    save_path = os.path.join(my_path, plot_name + ".pdf")
+    plt.savefig(save_path, format='pdf', bbox_inches='tight')
     plt.show()
     
     plt.figure(figsize=(5, 5), constrained_layout=True)
@@ -185,11 +197,11 @@ def EVAL_GluCEST(data_path, seq_path, date):
     plt.xlim([-5, 5])
     plt.ylim([0.47,1.02])
     plt.plot(w, Z_spectrum, "r.-")
-    plt.xlabel('Frequency offset Δω [ppm]')
+    plt.xlabel('Δω [ppm]')
     plt.ylabel(r'$S_{\mathrm{sat}}/S_{\mathrm{0}}$')
     plt.gca().invert_xaxis()
     plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
-    plt.title("Mean Z-spectrum for 10mM")
+    #plt.title("Mean Z-spectrum for 10mM")
     # Make axes box square in screen units
     xrange = 10       
     yrange = 1.02 - 0.47
@@ -202,7 +214,7 @@ def EVAL_GluCEST(data_path, seq_path, date):
     plt.axvline(x=3, color='grey', linestyle='--', linewidth=0.8, alpha=0.7)
     plt.xlim([0, 4])
     plt.ylim([-0.05,18])
-    plt.xlabel('Frequency offset Δω [ppm]')
+    plt.xlabel('Δω [ppm]')
     plt.ylabel('MTRasym [%]')
     plt.gca().invert_xaxis()
     plt.title("Mean MTRasym-spectrum for 10mM")
@@ -238,6 +250,12 @@ def EVAL_GluCEST(data_path, seq_path, date):
     mm_avg = np.array([mm0_avg, mm2_avg, mm4_avg, mm6_avg, mm8_avg, mm10_avg])
     mm_sem = np.array([mm0_sem, mm2_sem, mm4_sem, mm6_sem, mm8_sem, mm10_sem])
 
+    combined = np.concatenate((mm_avg, mm_sem))
+    plot_name = main_path + str("_MTRasym")
+    my_path = r"c:\asb\ntnu\plotting\auto_save_png\concentrations"
+    save_path = os.path.join(my_path, plot_name + ".txt")
+    np.savetxt(save_path, combined, fmt='%s')
+
     # Plot data with error bars
     plt.errorbar(mm, mm_avg, yerr=mm_sem, fmt='o', label="Averages of data with SEM", capsize=6)
 
@@ -257,7 +275,7 @@ def EVAL_GluCEST(data_path, seq_path, date):
 if __name__ == "__main__":
     globals()["EVAL_GluCEST"] = EVAL_GluCEST 
     EVAL_GluCEST(
-        data_path=r'C:\asb\ntnu\MRIscans\250520\gluCEST', 
-        seq_path=r'C:\asb\ntnu\MRIscans\250520\seq_file_siemens.seq',
+        data_path=r'c:\asb\ntnu\MRIscans\250407\250407siemens\dicoms', 
+        seq_path=r'c:\asb\ntnu\MRIscans\250407\250407siemens\seq_files\seq_file_siemens.seq',
         date = ''
     )

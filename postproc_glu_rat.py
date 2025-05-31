@@ -9,6 +9,21 @@ import pypulseq as pp
 from csaps import csaps
 import scipy as sc
 
+folder_path = r'c:\asb\ntnu\MRIscans\250522\dicoms\E10'
+
+dcm_files = [f for f in os.listdir(folder_path) if f.endswith(".dcm")][:10]
+
+# Plot
+fig, axes = plt.subplots(2, 5, figsize=(12, 5))
+for ax, filename in zip(axes.flatten(), dcm_files):
+    ds = pydicom.dcmread(os.path.join(folder_path, filename))
+    ax.imshow(ds.pixel_array, cmap='gray')
+    ax.axis('off')
+    ax.set_title(filename, fontsize=8)
+
+plt.tight_layout()
+plt.show()
+
 # Store dicoms of each offsets in one folder
 # Create a sequence file for the acquisition
 # Run with pypulseq==1.4.2 and pydicom==3.0.1
@@ -62,8 +77,17 @@ def EVAL_GluCEST(data_path, seq_path):
     sz = V.shape
     V = np.reshape(V, [sz[0], sz[1], n_meas, sz[2] // n_meas]).transpose(0, 1, 3, 2)
 
+    image_to_plot = V[:, :, 0, 0]
+    rotated_image = np.rot90(image_to_plot, k=2)
+    # Create figure and axis
+    fig, ax = plt.subplots(figsize=(5, 5))
+    ax.imshow(rotated_image, cmap='gray')
+    
+    #plt.show()
+
+
     # Vectorization
-    threshold = 2 #np.max(V)*0.1 # threshold of 10%
+    threshold = 0 #np.max(V)*0.1 # threshold of 10%
     mask = np.squeeze(V[:, :, :, 0]) > threshold
     mask_idx = np.where(mask.ravel())[0]
     V_m_z = V.reshape(-1, n_meas).T
@@ -136,9 +160,10 @@ def EVAL_GluCEST(data_path, seq_path):
 
     # Choose pixels for ROI
     pixels_dict = {          
-        'hippocampus': [76,82,55,75],    
-        'wm': [62,68,62,82],    
-        'gm': [62,68,92,112],    
+        'hippocampus1': [37,38,27,30],
+        'hippocampus2': [37,38,36,39],      
+        'wm': [32,33,21,24],    
+        'gm': [32,33,40,43],    
     }
 
     print('--- Plotting GluCEST images ---')
@@ -155,9 +180,9 @@ def EVAL_GluCEST(data_path, seq_path):
     cb = plt.colorbar(im, cax=cax, format="%.2f")
     cb.set_ticks(np.linspace(vmin, vmax, 5)) 
     ax.set_title("Z(Δω) = %.2f ppm" % w_offset_of_interest)
-    plt.show()
+    #plt.show()
 
-    pixels_glu = pixels_dict.get('hippocampus')
+    pixels_glu = pixels_dict.get('hippocampus1')
     array_MTR = V_MTRasym_reshaped[pixels_glu[0]:pixels_glu[1],pixels_glu[2]:pixels_glu[3],slice_of_interest,1:] # 1: to remove the M0 scan
     flattened_vectors_MTR_glu = array_MTR.reshape(-1, array_MTR.shape[-1]) 
 
@@ -169,19 +194,94 @@ def EVAL_GluCEST(data_path, seq_path):
     # Save to text file
     np.savetxt(r'C:\asb\ntnu\master\GluCEST\flattened_Taurine_opt.txt', flatten_glu1, fmt="%.6f")  # or fmt="%d" for integers'''
 
-    MTR_max = np.max(flattened_vectors_MTR_glu)
+    #MTR_max = np.max(flattened_vectors_MTR_glu)
     fig, ax = plt.subplots(figsize=(5, 5)) 
-    vmin, vmax = 0, MTR_max # set GluCEST contrast range
+    vmin, vmax = 0, 0.15 # set GluCEST contrast range
     im = ax.imshow(V_MTRasym_reshaped[:,:,slice_of_interest,offset_of_interest], vmin=vmin, vmax=vmax, cmap='OrRd')
     divider = make_axes_locatable(ax)
     cax = divider.append_axes("right", size="5%", pad=0.05)
     cb = plt.colorbar(im, cax=cax, format="%.2f")
     cb.set_ticks(np.linspace(vmin, vmax, 5)) 
     ax.set_title("MTRasym(Δω) = %.2f ppm" % w_offset_of_interest)
+     # Assume V is already defined and has the correct dimensions
     plt.show()
 
+
+    # Define the image
+    image = V_MTRasym_reshaped[:, :, slice_of_interest, offset_of_interest]
+
+    # Define center and radius
+    # Define oval (ellipse) parameters
+    '''center_x, center_y = 32, 36
+    width, height = 35, 24  # full width/height of ellipse
+    a = width / 2  # semi-major axis
+    b = height / 2  # semi-minor axis
+
+    # Create elliptical mask
+    Y, X = np.ogrid[:image.shape[0], :image.shape[1]]
+    mask = ((X - center_x) / a) ** 2 + ((Y - center_y) / b) ** 2 <= 1
+
+    # Apply the mask: set outside pixels to 0
+    masked_image = np.copy(image)
+    masked_image[~mask] = 0'''
+
+    '''fig, axes = plt.subplots(1, 2, figsize=(10, 5))  # 1 row, 2 columns
+
+    # Plot first image (grayscale anatomical)
+    vmin, vmax = 0, 0.15
+
+    rotated_image2 = np.rot90(masked_image, k=2)
+
+    # Plot first image (slightly smaller visually)
+    axes[0].imshow(rotated_image, cmap='gray')
+    axes[0].set_title("Anatomical Reference")
+    axes[0].axis('off')
+
+    # Plot second image (standard size)
+    im = axes[1].imshow(rotated_image2, vmin=vmin, vmax=vmax, cmap='OrRd')
+    axes[1].set_title("MTRasym(Δω) = %.2f ppm" % w_offset_of_interest)
+    axes[1].axis('off')
+
+    # Add colorbar to the second plot
+    divider = make_axes_locatable(axes[1])
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    cb = plt.colorbar(im, cax=cax, format="%.2f")
+    cb.set_ticks(np.linspace(vmin, vmax, 5))
+    plot_name = str("slice1_gluCEST")
+    my_path = r"c:\asb\ntnu\plotting\in_vivo"
+    save_path = os.path.join(my_path, plot_name + ".png")
+    plt.savefig(save_path, format='png', bbox_inches='tight')
+    #plt.show()'''
+
+    # Plotting
+    fig, ax = plt.subplots(figsize=(5, 5)) 
+    rotated_image2 = np.rot90(image, k=2)
+    vmin, vmax = 0, 0.15  # set GluCEST contrast range
+    im = ax.imshow(rotated_image2, vmin=vmin, vmax=vmax, cmap='OrRd')
+
+    # Add colorbar
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    cb = plt.colorbar(im, cax=cax, format="%.2f")
+    cb.set_ticks(np.linspace(vmin, vmax, 5)) 
+
+    # Title
+    ax.set_title("MTRasym(Δω) = %.2f ppm" % w_offset_of_interest)
+    '''plot_name = str("slice2_gluCEST")
+    my_path = r"c:\asb\ntnu\plotting\in_vivo"
+    save_path = os.path.join(my_path, plot_name + ".png")
+    plt.savefig(save_path, format='png', bbox_inches='tight')'''
+
+    plt.show()
+
+    input()
+
+
+
+
+
     # Choose metabolites
-    label_names = ['hippocampus', 'gm', 'wm']
+    label_names = ['hippocampus1', 'hippocampus2', 'gm', 'wm']
     m_avg = []
     m_sem = []
 
@@ -238,7 +338,7 @@ def EVAL_GluCEST(data_path, seq_path):
         plt.plot(w, MTR_spectrum, marker='o', markersize=2, label=label_names[i], color=colors[i])
         plt.axvline(x=3, color='grey', linestyle='--', linewidth=0.8, alpha=0.7)
         plt.xlim([0, 4])
-        plt.ylim([-0.1,12])
+        plt.ylim([-0.1,16])
         plt.xlabel('Frequency offset Δω [ppm]')
         plt.ylabel('MTRasym [%]')
         plt.gca().invert_xaxis()
@@ -246,7 +346,7 @@ def EVAL_GluCEST(data_path, seq_path):
         plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
         # Make axes box square in screen units
         xrange = 4         
-        yrange = 12.1
+        yrange = 16.1
         aspect_ratio = xrange / yrange
         plt.gca().set_aspect(aspect_ratio, adjustable='box')
 
@@ -274,6 +374,6 @@ def EVAL_GluCEST(data_path, seq_path):
 if __name__ == "__main__":
     globals()["EVAL_GluCEST"] = EVAL_GluCEST 
     EVAL_GluCEST(
-        data_path=r'C:\asb\ntnu\MRIscans\250522\dicoms\E4\2', 
-        seq_path=r'C:\asb\ntnu\MRIscans\250522\seq_files\seq_file_E4.seq',
+        data_path=r'C:\asb\ntnu\MRIscans\250522\dicoms\E9\1', 
+        seq_path=r'C:\asb\ntnu\MRIscans\250522\seq_files\seq_file_E9.seq',
     )

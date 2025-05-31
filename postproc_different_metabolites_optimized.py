@@ -17,13 +17,13 @@ import scipy as sc
 # Set general IEEE-style parameters
 plt.rcParams.update({
     "text.usetex": False,  # Set to True if you have LaTeX installed
-    "font.family": "serif",
-    "font.size": 14,  # IEEE column text is usually around 8-9 pt
-    "axes.labelsize": 7,
-    "axes.titlesize": 7,
-    "legend.fontsize": 6,
-    "xtick.labelsize": 6,
-    "ytick.labelsize": 6,
+    "font.size": 10,  # IEEE column text is usually around 8-9 pt
+    "font.family": 'serif',
+    "axes.labelsize": 15,
+    "axes.titlesize": 1,
+    "legend.fontsize": 10,
+    "xtick.labelsize": 9,
+    "ytick.labelsize": 9,
     "lines.linewidth": 1,
     "lines.markersize": 4,
     "figure.dpi": 250,
@@ -184,9 +184,9 @@ def EVAL_GluCEST(data_path, seq_path):
     cb.set_ticks(np.linspace(vmin, vmax, 5)) 
     #ax.set_title("MTRasym(Δω) = %.2f ppm" % w_offset_of_interest)
     plot_name = main_path + str("_MTR_map")
-    my_path = r"c:\asb\ntnu\plotting\auto_save_png\different"
-    save_path = os.path.join(my_path, plot_name + ".png")
-    plt.savefig(save_path, format='png', bbox_inches='tight')
+    my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf\different"
+    save_path = os.path.join(my_path, plot_name + ".pdf")
+    plt.savefig(save_path, format='pdf', bbox_inches='tight')
     #plt.show()
 
     # Choose metabolites
@@ -231,9 +231,9 @@ def EVAL_GluCEST(data_path, seq_path):
 
     plt.legend(loc='lower right')
     plot_name = main_path + str("_Z_spectra")
-    my_path = r"c:\asb\ntnu\plotting\auto_save_png\different"
-    save_path = os.path.join(my_path, plot_name + ".png")
-    plt.savefig(save_path, format='png', bbox_inches='tight')
+    my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf\different"
+    save_path = os.path.join(my_path, plot_name + ".pdf")
+    plt.savefig(save_path, format='pdf', bbox_inches='tight')
     #plt.show()
 
     plt.figure(figsize=(5, 5))
@@ -252,7 +252,7 @@ def EVAL_GluCEST(data_path, seq_path):
         plt.axvline(x=3, color='grey', linestyle='--', linewidth=0.8, alpha=0.7)
         plt.xlim([0, 4])
         plt.ylim([-0.1,12])
-        plt.xlabel('Frequency offset Δω [ppm]')
+        plt.xlabel('Δω [ppm]')
         plt.ylabel('MTRasym [%]')
         plt.gca().invert_xaxis()
         #plt.title("MTRasym-spectra for different metabolites")
@@ -265,9 +265,9 @@ def EVAL_GluCEST(data_path, seq_path):
 
     plt.legend(loc='upper right')
     plot_name = main_path + str("_MTR_spectra")
-    my_path = r"c:\asb\ntnu\plotting\auto_save_png\different"
-    save_path = os.path.join(my_path, plot_name + ".png")
-    plt.savefig(save_path, format='png', bbox_inches='tight')
+    my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf\different"
+    save_path = os.path.join(my_path, plot_name + ".pdf")
+    plt.savefig(save_path, format='pdf', bbox_inches='tight')
     #plt.show()
 
     # GluCEST effect for each [conc]
@@ -275,11 +275,11 @@ def EVAL_GluCEST(data_path, seq_path):
     m_avg = np.array(m_avg)
     m_sem = np.array(m_sem)
 
-    combined = np.concatenate((m_avg, m_sem))
+    '''combined = np.concatenate((m_avg, m_sem))
     plot_name = main_path + str("_MTRasym")
     my_path = r"c:\asb\ntnu\plotting\auto_save_png\different"
     save_path = os.path.join(my_path, plot_name + ".txt")
-    np.savetxt(save_path, combined, fmt='%s')
+    np.savetxt(save_path, combined, fmt='%s')'''
 
     # Plot data with error bars
     plt.figure(figsize=(5, 5))

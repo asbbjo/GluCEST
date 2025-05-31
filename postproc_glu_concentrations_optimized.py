@@ -17,13 +17,13 @@ import scipy as sc
 # Set general IEEE-style parameters
 plt.rcParams.update({
     "text.usetex": False,  # Set to True if you have LaTeX installed
-    "font.family": "serif",
-    "font.size": 14,  # IEEE column text is usually around 8-9 pt
-    "axes.labelsize": 7,
-    "axes.titlesize": 7,
-    "legend.fontsize": 6,
-    "xtick.labelsize": 6,
-    "ytick.labelsize": 6,
+    "font.size": 10,  # IEEE column text is usually around 8-9 pt
+    "font.family": 'serif',
+    "axes.labelsize": 10,
+    "axes.titlesize": 1,
+    "legend.fontsize": 9,
+    "xtick.labelsize": 7,
+    "ytick.labelsize": 7,
     "lines.linewidth": 1,
     "lines.markersize": 4,
     "figure.dpi": 250,
@@ -202,12 +202,13 @@ def EVAL_GluCEST(data_path, seq_path, date):
     flattened_vectors_MTR = array_MTR.reshape(-1, array_MTR.shape[-1]) 
     MTR_spectrum = flattened_vectors_MTR.mean(axis=0)
 
-    print('--- Plotting ---')
     slice_of_interest = 0 # pick slice for evaluation (0 if only one slice)
     desired_offset = 3 # pick offset for evaluation (3 for GluCEST at 3 ppm)
     offset_of_interest = np.where(offsets == desired_offset)[0]  
     w_offset_of_interest = offsets[offset_of_interest]
 
+    print('--- Plotting ---')
+    
     fig, ax = plt.subplots(figsize=(5, 4)) 
     vmin, vmax = 0.5, 1  # Z-spectra range
     im = ax.imshow(V_Z_corr_reshaped[:, :, slice_of_interest, offset_of_interest],vmin=vmin, vmax=vmax, cmap='rainbow')
@@ -218,50 +219,64 @@ def EVAL_GluCEST(data_path, seq_path, date):
     ax.set_title("Z(Δω) = %.2f ppm" % w_offset_of_interest)
     plt.show()
 
+    main_path = data_path[-16:-10] + str('_') + data_path[-2:]
+
     MTR_max = np.max(flattened_vectors_MTR)/100
-    fig, ax = plt.subplots(figsize=(5, 4)) 
-    vmin, vmax = 0, MTR_max # set GluCEST contrast range
+    fig, ax = plt.subplots(figsize=(5, 5), constrained_layout=True) 
+    vmin, vmax = 0, 0.10 # set GluCEST contrast range (0.22 for pulse parameter gluCEST maps)
     im = ax.imshow(V_MTRasym_reshaped[:,:,slice_of_interest,offset_of_interest], vmin=vmin, vmax=vmax, cmap='OrRd')
     divider = make_axes_locatable(ax)
     cax = divider.append_axes("right", size="5%", pad=0.05)
     cb = plt.colorbar(im, cax=cax, format="%.2f")
     cb.set_ticks(np.linspace(vmin, vmax, 5)) 
-    ax.set_title("MTRasym(Δω) = %.2f ppm" % w_offset_of_interest)
-    plt.show()
+    #ax.set_title("MTRasym(Δω) = %.2f ppm" % w_offset_of_interest)
+    plot_name = main_path + str("_MTR_map")
+    my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf\concentrations"
+    save_path = os.path.join(my_path, plot_name + ".pdf")
+    plt.savefig(save_path, format='pdf', bbox_inches='tight')
+    #plt.show()
     
     plt.figure(figsize=(5, 5), constrained_layout=True)
     plt.axvline(x=3, color='grey', linestyle='--', linewidth=0.8, alpha=0.7)
-    plt.xlim([-5, 5])
-    plt.ylim([0.25,1.09])
-    plt.plot(w, Z_spectrum, "r.-")
-    plt.xlabel('Frequency offset Δω [ppm]')
-    plt.ylabel('Normalized MTR')
+    plt.xlim([-5, 5]) 
+    plt.ylim([0.12,1.1])
+    plt.plot(w, Z_spectrum, color='darkblue')
+    plt.xlabel('Δω [ppm]')
+    plt.ylabel(r'$S_{\mathrm{sat}}/S_{\mathrm{0}}$')
     plt.gca().invert_xaxis()
     plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
-    plt.title("Mean Z-spectrum for 10mM")
+    #plt.title("Mean Z-spectrum for 10mM")
     # Make axes box square in screen units
     xrange = 10       
-    yrange = 1.09 - 0.25
+    yrange = 1.1 - 0.12
     aspect_ratio = xrange / yrange
     plt.gca().set_aspect(aspect_ratio, adjustable='box')
-    plt.show()
+    plot_name = main_path + str("_z_spectra")
+    my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf\concentrations"
+    save_path = os.path.join(my_path, plot_name + ".pdf")
+    plt.savefig(save_path, format='pdf')
+    #plt.show()
 
     plt.figure(figsize=(5, 5), constrained_layout=True)
-    plt.plot(w, MTR_spectrum, "b.-")
+    plt.plot(w, MTR_spectrum, color='royalblue')
     plt.axvline(x=3, color='grey', linestyle='--', linewidth=0.8, alpha=0.7)
     plt.xlim([0, 4])
-    plt.ylim([-0.05,25])
-    plt.xlabel('Frequency offset Δω [ppm]')
+    plt.ylim([-0.05,10])
+    plt.xlabel('Δω [ppm]')
     plt.ylabel('MTRasym [%]')
     plt.gca().invert_xaxis()
-    plt.title("Mean MTRasym-spectrum for 10mM")
+    #plt.title("Mean MTRasym-spectrum for 10mM")
     plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
     # Make axes box square in screen units
     xrange = 4         
-    yrange = 25.05
+    yrange = 10.05
     aspect_ratio = xrange / yrange
     plt.gca().set_aspect(aspect_ratio, adjustable='box')
-    plt.show()
+    plot_name = main_path + str("_mtr_spectra")
+    my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf\concentrations"
+    save_path = os.path.join(my_path, plot_name + ".pdf")
+    plt.savefig(save_path, format='pdf')
+    #plt.show()
 
     # GluCEST effect for each [Glu]
     mm0 = V_MTRasym_reshaped_pc[pixels_0mm[0]:pixels_0mm[1],pixels_0mm[2]:pixels_0mm[3], slice_of_interest, offset_of_interest]
@@ -287,6 +302,14 @@ def EVAL_GluCEST(data_path, seq_path, date):
     mm_avg = np.array([mm0_avg, mm2_avg, mm4_avg, mm6_avg, mm8_avg, mm10_avg])
     mm_sem = np.array([mm0_sem, mm2_sem, mm4_sem, mm6_sem, mm8_sem, mm10_sem])
 
+    combined = np.concatenate((mm_avg, mm_sem))
+    plot_name = main_path + str("_MTRasym")
+    my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf\concentrations"
+    save_path = os.path.join(my_path, plot_name + ".txt")
+    np.savetxt(save_path, combined, fmt='%s')
+
+    plt.figure(figsize=(6, 5))
+
     # Plot data with error bars
     plt.errorbar(mm, mm_avg, yerr=mm_sem, fmt='o', label="Averages of data with SEM", capsize=6)
 
@@ -295,12 +318,16 @@ def EVAL_GluCEST(data_path, seq_path, date):
     trend_line = slope * mm + intercept  
 
     plt.plot(mm, trend_line, 'r--', label=f"Trend: y={slope:.2f}x + {intercept:.2f}")
-    plt.xlabel("Concentration of Glu [mM]")
-    plt.ylabel("MTRasym contrast [%]")
-    plt.title("Linear trend with concentrations")
+    plt.xlabel("Concentration [mM]")
+    plt.ylabel("gluCEST [%]")
+    plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
+    #plt.title("Linear trend with concentrations")
     plt.legend()
-    '''plt.grid(True)'''
-    plt.show()
+    plot_name = main_path + str("_linearities")
+    my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf\concentrations"
+    save_path = os.path.join(my_path, plot_name + ".pdf")
+    plt.savefig(save_path, format='pdf')
+    #plt.show()
     
 
 if __name__ == "__main__":

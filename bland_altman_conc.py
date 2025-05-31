@@ -19,22 +19,18 @@ plt.rcParams.update({
 
 # Define file info: (regular_path, optimized_path, metabolite_label)
 datasets = [
-    (r'c:\asb\ntnu\semesters\v25\CEST_code\Bland_altman_files\flattened_Glu_reg.txt', r'c:\asb\ntnu\semesters\v25\CEST_code\Bland_altman_files\flattened_Glu_opt.txt', 'Glu'),
-    (r'c:\asb\ntnu\semesters\v25\CEST_code\Bland_altman_files\flattened_Gln_reg.txt', r'c:\asb\ntnu\semesters\v25\CEST_code\Bland_altman_files\flattened_Gln_opt.txt', 'Gln'),
-    (r'c:\asb\ntnu\semesters\v25\CEST_code\Bland_altman_files\flattened_GABA_reg.txt', r'c:\asb\ntnu\semesters\v25\CEST_code\Bland_altman_files\flattened_GABA_opt.txt', 'GABA'),
-    (r'c:\asb\ntnu\semesters\v25\CEST_code\Bland_altman_files\flattened_NAA_reg.txt', r'c:\asb\ntnu\semesters\v25\CEST_code\Bland_altman_files\flattened_NAA_opt.txt', 'NAA'),
-    (r'c:\asb\ntnu\semesters\v25\CEST_code\Bland_altman_files\flattened_Cr_reg.txt', r'c:\asb\ntnu\semesters\v25\CEST_code\Bland_altman_files\flattened_Cr_opt.txt', 'Cr'),
-    (r'c:\asb\ntnu\semesters\v25\CEST_code\Bland_altman_files\flattened_Taurine_reg.txt', r'c:\asb\ntnu\semesters\v25\CEST_code\Bland_altman_files\flattened_Taurine_opt.txt', 'Taurine'),    
+    (r'c:\asb\ntnu\semesters\v25\CEST_code\Bland_altman_files\flattened_8_4mm.txt', r'c:\asb\ntnu\semesters\v25\CEST_code\Bland_altman_files\flattened_11_4mm.txt', '4 mM'),
+    (r'c:\asb\ntnu\semesters\v25\CEST_code\Bland_altman_files\flattened_8_6mm.txt', r'c:\asb\ntnu\semesters\v25\CEST_code\Bland_altman_files\flattened_11_6mm.txt', '6 mM'),
+    (r'c:\asb\ntnu\semesters\v25\CEST_code\Bland_altman_files\flattened_8_8mm.txt', r'c:\asb\ntnu\semesters\v25\CEST_code\Bland_altman_files\flattened_11_8mm.txt', '8 mM'),
+    (r'c:\asb\ntnu\semesters\v25\CEST_code\Bland_altman_files\flattened_8_10mm.txt', r'c:\asb\ntnu\semesters\v25\CEST_code\Bland_altman_files\flattened_11_10mm.txt', '10 mM'),
 ]
 
 # Assign a unique color to each metabolite
 metab_colors = {
-    'Glu': 'red',
-    'Gln': 'blue',
-    'GABA': 'orange',
-    'NAA': 'green',
-    'Cr': 'purple',
-    'Taurine': 'brown',
+    '4 mM': 'red',
+    '6 mM': 'blue',
+    '8 mM': 'orange',
+    '10 mM': 'green',
 }
 
 # Prepare containers
@@ -106,7 +102,7 @@ import os
 
 # Grid and layout
 plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
-plot_name = str("Bland_Altman_different")
+plot_name = str("Bland_Altman_conc_minus_0.0296_sem_1.182")
 my_path = r"c:\asb\ntnu\plotting\auto_save_png"
 save_path = os.path.join(my_path, plot_name + ".png")
 plt.savefig(save_path, format='png', bbox_inches='tight')

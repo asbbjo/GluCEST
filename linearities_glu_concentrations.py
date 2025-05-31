@@ -17,16 +17,16 @@ from sklearn.metrics import r2_score
 # Set general IEEE-style parameters
 plt.rcParams.update({
     "text.usetex": False,  # Set to True if you have LaTeX installed
-    "font.family": "serif",
-    "font.size": 14,  # IEEE column text is usually around 8-9 pt
-    "axes.labelsize": 9,
-    "axes.titlesize": 9,
-    "legend.fontsize": 8,
-    "xtick.labelsize": 8,
-    "ytick.labelsize": 8,
+    "font.size": 10,  # IEEE column text is usually around 8-9 pt
+    "font.family": 'serif',
+    "axes.labelsize": 15,
+    "axes.titlesize": 1,
+    "legend.fontsize": 10,
+    "xtick.labelsize": 9,
+    "ytick.labelsize": 9,
     "lines.linewidth": 1,
     "lines.markersize": 4,
-    "figure.dpi": 220,
+    "figure.dpi": 250,
 })
 
 def ppval(p, x):
@@ -185,7 +185,7 @@ if __name__ == "__main__":
 
     # 250312
     dcm_names = np.array(['23','28','29','30','32','33','34'])
-    label_names = ['10e-6s', '1s', '2s', '3s', '4s', '6s', '10s']
+    label_names = ['10⁻⁶ s', '1 s', '2 s', '3 s', '4 s', '6 s', '10 s']
     title = str("Linear trends with recovery times")
 
     # 250313
@@ -195,13 +195,13 @@ if __name__ == "__main__":
 
     # 250317
     '''dcm_names = np.array(['22','24','14','23','25'])
-    label_names = ['15ms', '30ms', '50ms', '100ms', '300ms'] # Different ROI for E14
+    label_names = ['15 ms', '30 ms', '50 ms', '100 ms', '300 ms'] # Different ROI for E14
     title = str("Linear trends with pulse length")'''
 
     # 250324
     '''dcm_names = np.array(['10','11','12','13','14','15'])
     label_names = ['10e-5s', '1s', '2s', '3s', '5s', '10s']
-    title = str("Linear trends with recovery time")
+    title = str("Linear trends with recovery time")'''
 
     #dcm_names = np.array(['16','17','18','19','20']) 
     #label_names = ['1uT', '2uT', '3uT', '4uT', '5uT'] 
@@ -253,21 +253,21 @@ if __name__ == "__main__":
         plt.plot(mm, trend_line,'--', color=colors[i])  # , label=f"Trend {label_names[i]}: y={slope:.2f}x + {intercept:.2f}"
 
         # Labels and legend
-        plt.xlabel("Concentration of Glu [mM]")
+        plt.xlabel("Concentration [mM]")
         plt.ylabel("gluCEST [%]")
         xrange = 10       
-        yrange = 22
+        yrange = 18
         aspect_ratio = xrange / yrange
         plt.gca().set_aspect(aspect_ratio, adjustable='box')
         #plt.title(title)
         plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
         plt.legend()
 
-    plot_name = str("linearities_recovery_times")
-    my_path = r"c:\asb\ntnu\plotting\auto_save_png\concentrations"
-    save_path = os.path.join(my_path, plot_name + ".png")
-    plt.savefig(save_path, format='png')
+    plot_name = str("linearities_recovery_time")
+    my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf\pulseparameters"
+    save_path = os.path.join(my_path, plot_name + ".pdf")
+    plt.savefig(save_path, format='pdf')
 
-    save_path = os.path.join(my_path, plot_name + ".txt")
-    np.savetxt(save_path, np.array(r2_list), fmt='%s')
+    #save_path = os.path.join(my_path, plot_name + ".txt")
+    #np.savetxt(save_path, np.array(r2_list), fmt='%s')
     #plt.show()
