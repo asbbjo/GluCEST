@@ -6,11 +6,11 @@ plt.rcParams.update({
     "text.usetex": False,
     "font.family": "serif",
     "font.size": 14,
-    "axes.labelsize": 7,
+    "axes.labelsize": 10,
     "axes.titlesize": 7,
-    "legend.fontsize": 6,
-    "xtick.labelsize": 6,
-    "ytick.labelsize": 6,
+    "legend.fontsize": 8,
+    "xtick.labelsize": 7,
+    "ytick.labelsize": 7,
     "lines.linewidth": 1,
     "lines.markersize": 4,
     "figure.dpi": 250,
@@ -63,7 +63,7 @@ plt.figure(figsize=(6, 6))
 
 # Plot with correct colors
 for mean_val, diff_val, c in zip(all_means, all_diffs, colors):
-    plt.scatter(mean_val, diff_val, color=c, alpha=0.3, s=10)
+    plt.scatter(mean_val, diff_val, color=c, alpha=0.5, s=10)
 
 # Add statistical lines
 plt.axhline(mean_diff, color='black', linestyle='--', label='Mean difference')
@@ -83,8 +83,8 @@ plt.ylim([-2.5, 2.5])
 # Create a dummy legend
 from matplotlib.lines import Line2D
 legend_elements = [
-    Line2D([0], [0], marker='o', color='w', label='Glu+Gln', markerfacecolor='red', markersize=6, alpha=0.3),
-    Line2D([0], [0], marker='o', color='w', label='Glu+GABA', markerfacecolor='blue', markersize=6, alpha=0.3),
+    Line2D([0], [0], marker='o', color='w', label='Glu+Gln', markerfacecolor='red', markersize=6, alpha=0.5),
+    Line2D([0], [0], marker='o', color='w', label='Glu+GABA', markerfacecolor='blue', markersize=6, alpha=0.5),
     Line2D([], [], color='black', linestyle='--', label='Mean difference'),
     Line2D([], [], color='gray', linestyle='--', label='±1.96 SD'),
 ]
@@ -99,8 +99,8 @@ aspect_ratio = xrange / yrange
 plt.gca().set_aspect(aspect_ratio, adjustable='box')
 plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
 plot_name = str("Bland_Altman_mixed")
-my_path = r"c:\asb\ntnu\plotting\auto_save_png"
-save_path = os.path.join(my_path, plot_name + ".png")
-plt.savefig(save_path, format='png', bbox_inches='tight')
+my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf\stats"
+save_path = os.path.join(my_path, plot_name + ".pdf")
+plt.savefig(save_path, format='pdf', bbox_inches='tight')
 # Show
 plt.show()

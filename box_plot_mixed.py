@@ -7,11 +7,11 @@ plt.rcParams.update({
     "text.usetex": False,
     "font.family": "serif",
     "font.size": 14,
-    "axes.labelsize": 7,
+    "axes.labelsize": 10,
     "axes.titlesize": 7,
-    "legend.fontsize": 6,
-    "xtick.labelsize": 6,
-    "ytick.labelsize": 6,
+    "legend.fontsize": 8,
+    "xtick.labelsize": 7,
+    "ytick.labelsize": 7,
     "lines.linewidth": 1,
     "lines.markersize": 4,
     "figure.dpi": 250,
@@ -34,12 +34,12 @@ datasets = [
 
 # Assign a unique color to each metabolite
 metab_colors = {
-    '10Glu_Gln': 'red',
-    '6Glu_Gln': 'red',
-    '2Glu_Gln': 'red',
-    '10Glu_GABA': 'blue',
-    '6Glu_GABA': 'blue',
-    '2Glu_GABA': 'blue',
+    '10GluGln': 'red',
+    '6GluGln': 'red',
+    '2GluGln': 'red',
+    '10GluGABA': 'blue',
+    '6GluGABA': 'blue',
+    '2GluGABA': 'blue',
 }
 
 # Prepare data
@@ -59,9 +59,9 @@ for regular_path, optimized_path, label in datasets:
 
     # Determine color key
     if label == 'Gln':
-        color_key = f'{conc}Glu_Gln'
+        color_key = f'{conc}GluGln'
     elif label == 'GABA':
-        color_key = f'{conc}Glu_GABA'
+        color_key = f'{conc}GluGABA'
     else:
         color_key = 'unknown'
 
@@ -71,11 +71,11 @@ for regular_path, optimized_path, label in datasets:
 
     # Append data and labels
     boxplot_data.append(reg)
-    boxplot_labels.append(f'{color_key}_reg')
+    boxplot_labels.append(f'{color_key}')
     boxplot_colors.append(metab_colors.get(color_key, 'gray'))
 
     boxplot_data.append(opt)
-    boxplot_labels.append(f'{color_key}_opt')
+    boxplot_labels.append(f'{color_key}')
     boxplot_colors.append(metab_colors.get(color_key, 'gray'))
 
 # Plotting
@@ -88,6 +88,11 @@ for patch, color in zip(box['boxes'], boxplot_colors):
     patch.set_alpha(0.5)
 
 # Final touches
+for i in range(len(boxplot_labels)):
+    if i%2:
+        boxplot_labels[i] = str(boxplot_labels[i]) + str(' opt')
+    else: 
+        boxplot_labels[i] = str(boxplot_labels[i]) + str(' reg')
 plt.xticks(ticks=np.arange(1, len(boxplot_labels) + 1), labels=boxplot_labels, rotation=45)
 plt.ylabel('gluCEST effect [%]')
 #plt.title('Comparison of Regular and Optimized GluCEST Effects')
@@ -105,7 +110,7 @@ import os
 # Grid and layout
 #plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
 plot_name = str("box_plot_mixed")
-my_path = r"c:\asb\ntnu\plotting\auto_save_png"
-save_path = os.path.join(my_path, plot_name + ".png")
-plt.savefig(save_path, format='png', bbox_inches='tight')
+my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf\stats"
+save_path = os.path.join(my_path, plot_name + ".pdf")
+plt.savefig(save_path, format='pdf', bbox_inches='tight')
 plt.show()

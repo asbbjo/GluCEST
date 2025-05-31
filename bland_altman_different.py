@@ -7,11 +7,11 @@ plt.rcParams.update({
     "text.usetex": False,
     "font.family": "serif",
     "font.size": 14,
-    "axes.labelsize": 7,
+    "axes.labelsize": 10,
     "axes.titlesize": 7,
-    "legend.fontsize": 6,
-    "xtick.labelsize": 6,
-    "ytick.labelsize": 6,
+    "legend.fontsize": 8,
+    "xtick.labelsize": 7,
+    "ytick.labelsize": 7,
     "lines.linewidth": 1,
     "lines.markersize": 4,
     "figure.dpi": 250,
@@ -69,7 +69,7 @@ plt.figure(figsize=(6, 6))
 
 # Scatter plot with colors
 for mean_val, diff_val, c in zip(all_means, all_diffs, colors):
-    plt.scatter(mean_val, diff_val, color=c, alpha=0.3, s=10)
+    plt.scatter(mean_val, diff_val, color=c, alpha=0.5, s=10)
 
 # Add statistical lines
 plt.axhline(mean_diff, color='black', linestyle='--', label='Mean difference')
@@ -89,7 +89,7 @@ plt.gca().xaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f'{x:.0f}'))
 # Custom legend for metabolites
 legend_elements = [
     Line2D([0], [0], marker='o', color='w', label=metab,
-           markerfacecolor=color, markersize=6, alpha=0.3)
+           markerfacecolor=color, markersize=6, alpha=0.5)
     for metab, color in metab_colors.items()
 ]
 legend_elements.append(Line2D([], [], color='black', linestyle='--', label='Mean difference'))
@@ -107,7 +107,7 @@ import os
 # Grid and layout
 plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
 plot_name = str("Bland_Altman_different")
-my_path = r"c:\asb\ntnu\plotting\auto_save_png"
-save_path = os.path.join(my_path, plot_name + ".png")
-plt.savefig(save_path, format='png', bbox_inches='tight')
+my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf\stats"
+save_path = os.path.join(my_path, plot_name + ".pdf")
+plt.savefig(save_path, format='pdf', bbox_inches='tight')
 plt.show()
