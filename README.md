@@ -1,3 +1,3 @@
-# GluCEST @ NTNU x St. Olavs Hospital
+# Repo for the gluCEST at NTNU and St. Olavs Hospital
 
-Glutamate-weighted CEST MRI (GluCEST) imaging for mapping neurometabolism: The importance of B1-corrections in GluCEST post-processing
+Glutamate-weighted CEST MRI (gluCEST) imaging for mapping neurometabolism: An optimized CEST protocol for glutamate-weighted imaging
