@@ -57,7 +57,7 @@ def EVAL_GluCEST(data_path, seq_path, date):
     collection = [pydicom.dcmread(os.path.join(dcmpath, filename)) for filename in sorted(os.listdir(dcmpath))]
     # Extract the volume data
     V = np.stack([dcm.pixel_array for dcm in collection])
-    V = np.transpose(V[:,:,:,-1], (1, 2, 0)) # erase the last dimention due to jpeg format ([f,x,y,rgb] => [f,x,y])
+    V = np.transpose(V[:,:,:,-1], (1, 2, 0)) # Erase the last dimention due to jpeg format ([f,x,y,rgb] => [f,x,y])
     sz = V.shape
     V = np.reshape(V, [sz[0], sz[1], n_meas, sz[2] // n_meas]).transpose(0, 1, 3, 2)
 
@@ -217,7 +217,7 @@ def EVAL_GluCEST(data_path, seq_path, date):
         pixels_metabolite = pixels_dict.get(key)
 
         # Spectrum handling phantom
-        V_MTRasym_reshaped_pc = V_MTRasym_reshaped*100
+        V_MTRasym_reshaped_pc = V_MTRasym_reshaped*100 
         array_MTR = V_MTRasym_reshaped_pc[pixels_metabolite[0]:pixels_metabolite[1],pixels_metabolite[2]:pixels_metabolite[3],slice_of_interest,1:] # 1: to remove the M0 scan
         flattened_vectors_MTR = array_MTR.reshape(-1, array_MTR.shape[-1]) 
         MTR_spectrum = flattened_vectors_MTR.mean(axis=0)
