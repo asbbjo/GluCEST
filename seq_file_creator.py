@@ -1,4 +1,3 @@
-# Glu_7T_001_3p7uT_block_50ms
 # Glutamate weighted protocol according to https://doi.org/10.1002/mrm.27362
 # Pipeline from https://github.com/kherz/pulseq-cest-library/tree/master/ 
 #
@@ -11,12 +10,10 @@ from pathlib import Path
 
 import numpy as np
 import pypulseq as pp
-#from bmctool.utils.pulses.calc_power_equivalents import calc_power_equivalent
-#from bmctool.utils.pulses.make_hanning import make_gauss_hanning
 from bmctool.utils.seq.write import write_seq
 
 # get id of generation file
-seqid = Path(__file__).stem + "_redo_E26"
+seqid = Path(__file__).stem + "_id_for_your_file"
 
 # get folder of generation file
 folder = Path(__file__).parent
@@ -38,13 +35,8 @@ defs["td"] = 0.01e-3  # interpulse delay [s]
 defs["trec"] = 10  # recovery time [s]
 defs["trec_m0"] = 10  # recovery time before M0 [s]
 defs["m0_offset"] = -100  # m0 offset [ppm]
-defs["offsets_ppm"] = np.array([
-    -100, -15, -5, -4, -3.5, -3.25, -3, -2.75, -2.5, -2,
-    -1.5, -1, -0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75, 1,
-    1.5, 2, 2.5, 2.75, 2.875, 3, 3.125, 3.25, 3.375, 3.5,
-    3.65, 3.8, 4, 4.5, 5, 15])
-'''defs["offsets_ppm"] = np.append(defs["m0_offset"],np.concatenate(
-    [np.arange(-5, 0, 0.2), np.arange(0, 5.2, 0.2)])) # offset vector [ppm])'''
+defs["offsets_ppm"] = np.append(defs["m0_offset"],np.concatenate(
+    [np.arange(-5, 0, 0.2), np.arange(0, 5.2, 0.2)])) # offset vector [ppm])
 
 
 defs["dcsat"] = (defs["tp"]) / (defs["tp"] + defs["td"])  # duty cycle
