@@ -10,7 +10,7 @@ plt.rcParams.update({
     "axes.labelsize": 10,
     "axes.titlesize": 7,
     "legend.fontsize": 8,
-    "xtick.labelsize": 7,
+    "xtick.labelsize": 9,
     "ytick.labelsize": 7,
     "lines.linewidth": 1,
     "lines.markersize": 4,
@@ -34,12 +34,12 @@ datasets = [
 
 # Assign a unique color to each metabolite
 metab_colors = {
-    '10GluGln': 'red',
-    '6GluGln': 'red',
-    '2GluGln': 'red',
-    '10GluGABA': 'blue',
-    '6GluGABA': 'blue',
-    '2GluGABA': 'blue',
+    'Glu10mM+Gln': 'red',
+    'Glu6mM+Gln': 'red',
+    'Glu2mM+Gln': 'red',
+    'Glu10mM+GABA': 'blue',
+    'Glu6mM+GABA': 'blue',
+    'Glu2mM+GABA': 'blue',
 }
 
 # Prepare data
@@ -56,14 +56,8 @@ for regular_path, optimized_path, label in datasets:
     conc_match = re.match(r'(\d+)', conc_raw)
     conc = conc_match.group(1) if conc_match else 'X'  # Get '2', '6', '10'
 
-
-    # Determine color key
-    if label == 'Gln':
-        color_key = f'{conc}GluGln'
-    elif label == 'GABA':
-        color_key = f'{conc}GluGABA'
-    else:
-        color_key = 'unknown'
+    # Combine concentration and metabolite for unique color key
+    color_key = f'Glu{conc}mM+{label}'
 
     # Load data
     reg = np.loadtxt(regular_path) * 100
@@ -94,6 +88,8 @@ for i in range(len(boxplot_labels)):
     else: 
         boxplot_labels[i] = str(boxplot_labels[i]) + str(' reg')
 plt.xticks(ticks=np.arange(1, len(boxplot_labels) + 1), labels=boxplot_labels, rotation=45)
+plt.gca().tick_params(axis='x', which='both', pad=5)  # Optional: adjust distance from axis
+plt.setp(plt.gca().get_xticklabels(), ha='right', rotation=45, x=-0.05)  # shift left
 plt.ylabel('gluCEST effect [%]')
 #plt.title('Comparison of Regular and Optimized GluCEST Effects')
 

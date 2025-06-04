@@ -20,7 +20,7 @@ plt.rcParams.update({
     "font.size": 10,  # IEEE column text is usually around 8-9 pt
     "font.family": 'serif',
     "axes.labelsize": 10,
-    "axes.titlesize": 1,
+    "axes.titlesize": 10,
     "legend.fontsize": 9,
     "xtick.labelsize": 7,
     "ytick.labelsize": 7,
@@ -213,7 +213,7 @@ def EVAL_GluCEST(data_path, seq_path, date):
     # Save to text file
     np.savetxt(r'C:\asb\ntnu\master\GluCEST\flattened_11_10mm.txt', flatten_glu1, fmt="%.6f")  # or fmt="%d" for integers'''
 
-    fig, ax = plt.subplots(figsize=(5, 5), constrained_layout=True) 
+    '''fig, ax = plt.subplots(figsize=(5, 5), constrained_layout=True) 
     vmin, vmax = 0.5, 1  # Z-spectra range
     im = ax.imshow(V_Z_corr_reshaped[:, :, slice_of_interest, offset_of_interest],vmin=vmin, vmax=vmax, cmap='rainbow')
     divider = make_axes_locatable(ax)
@@ -221,24 +221,52 @@ def EVAL_GluCEST(data_path, seq_path, date):
     cb = plt.colorbar(im, cax=cax, format="%.2f")
     cb.set_ticks(np.linspace(vmin, vmax, 5)) 
     ax.set_title("Z(Δω) = %.2f ppm" % w_offset_of_interest)
-    #plt.show()
+    #plt.show()'''
 
     main_path = data_path[-17:-11] + str('_') + data_path[-3:]
 
     MTR_max = np.max(flattened_vectors_MTR)/100
     fig, ax = plt.subplots(figsize=(5, 5), constrained_layout=True) 
-    vmin, vmax = 0, 0.14 # set GluCEST contrast range (0.22 for pulse parameter gluCEST maps)
+    vmin, vmax = 0, 0.22 # set GluCEST contrast range (0.22 for pulse parameter gluCEST maps)
     im = ax.imshow(V_MTRasym_reshaped[:,:,slice_of_interest,offset_of_interest], vmin=vmin, vmax=vmax, cmap='OrRd')
     divider = make_axes_locatable(ax)
     cax = divider.append_axes("right", size="5%", pad=0.05)
     cb = plt.colorbar(im, cax=cax, format="%.2f")
     cb.set_ticks(np.linspace(vmin, vmax, 5)) 
+
+    '''ax.text(44, 96, r'10 mM', color='black', fontsize=10)
+    ax.text(79, 90, r'8 mM', color='black', fontsize=10)
+    ax.text(92, 63, r'6 mM', color='black', fontsize=10)
+    ax.text(72, 37, r'4 mM', color='black', fontsize=10)
+    ax.text(44, 39, r'2 mM', color='black', fontsize=10)
+    ax.text(23, 68, r'0 mM', color='black', fontsize=10) # Repeatablity '''
+
+    ax.text(74, 38, r'10 mM', color='black', fontsize=11)
+    ax.text(39, 37, r'8 mM', color='black', fontsize=11)
+    ax.text(21, 60, r'6 mM', color='black', fontsize=11)
+    ax.text(39, 91, r'4 mM', color='black', fontsize=11)
+    ax.text(74, 94, r'2 mM', color='black', fontsize=11)
+    ax.text(90, 70, r'0 mM', color='black', fontsize=11) # Pulse parameters sat power and rec times'''
+
+    '''ax.text(74, 35, r'10 mM', color='black', fontsize=11)
+    ax.text(39, 37, r'8 mM', color='black', fontsize=11)
+    ax.text(21, 60, r'6 mM', color='black', fontsize=11)
+    ax.text(39, 89, r'4 mM', color='black', fontsize=11)
+    ax.text(74, 94, r'2 mM', color='black', fontsize=11)
+    ax.text(90, 70, r'0 mM', color='black', fontsize=11) # Pulse parameters pulse lengths'''
+
+
+
+    #plt.text(60, 60, r'10 mM', color='black', fontsize=7)
     #ax.set_title("MTRasym(Δω) = %.2f ppm" % w_offset_of_interest)
     plot_name = main_path + str("_MTR_map")
-    my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf\concentrations"
+    my_path = r"c:\asb\ntnu\plotting\gluCEST_maps_labels\concentrations"
     save_path = os.path.join(my_path, plot_name + ".pdf")
     plt.savefig(save_path, format='pdf', bbox_inches='tight')
     #plt.show()
+
+    input('stop')
+    input('stop here')
     
     plt.figure(figsize=(5, 5), constrained_layout=True)
     plt.axvline(x=3, color='grey', linestyle='--', linewidth=0.8, alpha=0.7)
@@ -258,7 +286,7 @@ def EVAL_GluCEST(data_path, seq_path, date):
     plot_name = main_path + str("_z_spectra")
     my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf\concentrations"
     save_path = os.path.join(my_path, plot_name + ".pdf")
-    plt.savefig(save_path, format='pdf')
+    #plt.savefig(save_path, format='pdf')
     #plt.show()
 
     plt.figure(figsize=(5, 5), constrained_layout=True)
@@ -279,7 +307,7 @@ def EVAL_GluCEST(data_path, seq_path, date):
     plot_name = main_path + str("_mtr_spectra")
     my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf\concentrations"
     save_path = os.path.join(my_path, plot_name + ".pdf")
-    plt.savefig(save_path, format='pdf')
+    #plt.savefig(save_path, format='pdf')
     #plt.show()
 
     # GluCEST effect for each [Glu]
@@ -310,7 +338,7 @@ def EVAL_GluCEST(data_path, seq_path, date):
     plot_name = main_path + str("_MTRasym")
     my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf\concentrations"
     save_path = os.path.join(my_path, plot_name + ".txt")
-    np.savetxt(save_path, combined, fmt='%s')
+    #np.savetxt(save_path, combined, fmt='%s')
 
     plt.figure(figsize=(6, 5))
 
@@ -330,14 +358,14 @@ def EVAL_GluCEST(data_path, seq_path, date):
     plot_name = main_path + str("_linearities")
     my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf\concentrations"
     save_path = os.path.join(my_path, plot_name + ".pdf")
-    plt.savefig(save_path, format='pdf')
+    #plt.savefig(save_path, format='pdf')
     #plt.show()
     
 
 if __name__ == "__main__":
     globals()["EVAL_GluCEST"] = EVAL_GluCEST 
     EVAL_GluCEST(
-        data_path=r'C:\asb\ntnu\MRIscans\250408\dicoms\E11', 
-        seq_path=r'C:\asb\ntnu\MRIscans\250408\seq_files\seq_file_E11.seq',
-        date = '250408'
+        data_path=r'C:\asb\ntnu\MRIscans\250312\dicoms\E23', 
+        seq_path=r'C:\asb\ntnu\MRIscans\250312\seq_files\seq_file_E23.seq',
+        date = '250312'
     )

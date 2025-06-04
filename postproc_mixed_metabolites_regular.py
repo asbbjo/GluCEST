@@ -127,14 +127,14 @@ def EVAL_GluCEST(data_path, seq_path):
     offset_of_interest = np.where(offsets == desired_offset)[0]  
     w_offset_of_interest = offsets[offset_of_interest]
 
-    fig, ax = plt.subplots(figsize=(5, 5)) 
+    '''fig, ax = plt.subplots(figsize=(5, 5)) 
     vmin, vmax = 0.5, 1  # Z-spectra range
     im = ax.imshow(V_Z_corr_reshaped[:, :, slice_of_interest, offset_of_interest],vmin=vmin, vmax=vmax, cmap='rainbow')
     divider = make_axes_locatable(ax)
     cax = divider.append_axes("right", size="5%", pad=0.05)
     cb = plt.colorbar(im, cax=cax, format="%.2f")
     cb.set_ticks(np.linspace(vmin, vmax, 5)) 
-    ax.set_title("Z(Δω) = %.2f ppm" % w_offset_of_interest)
+    ax.set_title("Z(Δω) = %.2f ppm" % w_offset_of_interest)'''
     #plt.show()
 
     pixels_glu1 = pixels_dict.get('glu10mm+gln')
@@ -169,13 +169,28 @@ def EVAL_GluCEST(data_path, seq_path):
     cax = divider.append_axes("right", size="5%", pad=0.05)
     cb = plt.colorbar(im, cax=cax, format="%.2f")
     cb.set_ticks(np.linspace(vmin, vmax, 5)) 
+
+    ax.text(74, 35, r'Glu2mM', color='black', fontsize=10)
+    ax.text(81, 40, r'+Gln', color='black', fontsize=10)
+    ax.text(25, 37, r'Glu10mM', color='black', fontsize=10)
+    ax.text(27, 42, r'+GABA', color='black', fontsize=10)
+    ax.text(14, 60, r'Glu6mM', color='black', fontsize=10)
+    ax.text(16, 65, r'+GABA', color='black', fontsize=10)
+    ax.text(39, 94, r'Glu2mM', color='black', fontsize=10)
+    ax.text(41, 99, r'+GABA', color='black', fontsize=10)
+    ax.text(74, 94, r'Glu10mM', color='black', fontsize=10)
+    ax.text(81, 99, r'+Gln', color='black', fontsize=10)
+    ax.text(95, 60, r'Glu6mM', color='black', fontsize=10)
+    ax.text(102, 65, r'+Gln', color='black', fontsize=10)
+
     #ax.set_title("MTRasym(Δω) = %.2f ppm" % w_offset_of_interest)
     plot_name = main_path + str("_MTR_map_reg")
-    my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf\mixed"
+    my_path = r"c:\asb\ntnu\plotting\gluCEST_maps_labels"
     save_path = os.path.join(my_path, plot_name + ".pdf")
     plt.savefig(save_path, format='pdf', bbox_inches='tight')
-    #plt.show()
+    plt.show()
 
+    input('stop')
     # Choose metabolites
     label_names = ['Glu10mM+Gln', 'Glu6mM+Gln', 'Glu2mM+Gln', 'Glu10mM+GABA', 'Glu6mM+GABA', 'Glu2mM+GABA']
     m_avg = []

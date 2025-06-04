@@ -191,12 +191,27 @@ def EVAL_GluCEST(data_path, seq_path):
     cax = divider.append_axes("right", size="5%", pad=0.05)
     cb = plt.colorbar(im, cax=cax, format="%.2f")
     cb.set_ticks(np.linspace(vmin, vmax, 5)) 
+
+    ax.text(77, 35, r'Glu2mM', color='black', fontsize=10)
+    ax.text(84, 40, r'+Gln', color='black', fontsize=10)
+    ax.text(28, 37, r'Glu10mM', color='black', fontsize=10)
+    ax.text(30, 42, r'+GABA', color='black', fontsize=10)
+    ax.text(17, 60, r'Glu6mM', color='black', fontsize=10)
+    ax.text(19, 65, r'+GABA', color='black', fontsize=10)
+    ax.text(42, 94, r'Glu2mM', color='black', fontsize=10)
+    ax.text(44, 99, r'+GABA', color='black', fontsize=10)
+    ax.text(77, 94, r'Glu10mM', color='black', fontsize=10)
+    ax.text(84, 99, r'+Gln', color='black', fontsize=10)
+    ax.text(98, 60, r'Glu6mM', color='black', fontsize=10)
+    ax.text(105, 65, r'+Gln', color='black', fontsize=10)
+
     #ax.set_title("MTRasym(Δω) = %.2f ppm" % w_offset_of_interest)
     plot_name = main_path + str("_MTR_map_opt")
-    my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf\mixed"
+    my_path = r"c:\asb\ntnu\plotting\gluCEST_maps_labels"
     save_path = os.path.join(my_path, plot_name + ".pdf")
     plt.savefig(save_path, format='pdf', bbox_inches='tight')
-    #plt.show()
+    plt.show()
+    input('stop')
 
     # Choose metabolites
     label_names = ['Glu10mM+Gln', 'Glu6mM+Gln', 'Glu2mM+Gln', 'Glu10mM+GABA', 'Glu6mM+GABA', 'Glu2mM+GABA']

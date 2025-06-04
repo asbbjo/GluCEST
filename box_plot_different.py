@@ -10,7 +10,7 @@ plt.rcParams.update({
     "axes.labelsize": 10,
     "axes.titlesize": 7,
     "legend.fontsize": 8,
-    "xtick.labelsize": 7,
+    "xtick.labelsize": 9,
     "ytick.labelsize": 7,
     "lines.linewidth": 1,
     "lines.markersize": 4,
@@ -29,46 +29,60 @@ datasets = [
 
 # Assign a unique color to each metabolite
 metab_colors = {
-    'Glu': 'red',
-    'Gln': 'blue',
-    'GABA': 'orange',
-    'NAA': 'green',
-    'Cr': 'purple',
-    'Taurine': 'brown',
+    'Glu 10mM': 'red',
+    'Gln 2mM': 'blue',
+    'GABA 2mM': 'orange',
+    'NAA 10mM': 'green',
+    'Cr 6mM': 'purple',
+    'Taurine 2mM': 'brown',
 }
 
 # Prepare box plot data
 boxplot_data = []
 boxplot_labels = []
+boxplot_colors = []
 
-# Loop through all dataset pairs again for boxplot
+import re
+
+label_conc_map = {
+    'Glu': '10mM',
+    'Gln': '2mM',
+    'GABA': '2mM',
+    'NAA': '10mM',
+    'Cr': '6mM',
+    'Taurine': '2mM',
+}
+
 for regular_path, optimized_path, label in datasets:
+    metab_label = f"{label} {label_conc_map.get(label, 'X')}"
+    
     reg = np.loadtxt(regular_path) * 100
     opt = np.loadtxt(optimized_path) * 100
 
     boxplot_data.append(reg)
-    boxplot_labels.append(f'{label}')
+    boxplot_labels.append(f'{metab_label} reg')
+    boxplot_colors.append(metab_colors.get(metab_label, 'gray'))
 
     boxplot_data.append(opt)
-    boxplot_labels.append(f'{label}')
+    boxplot_labels.append(f'{metab_label} opt')
+    boxplot_colors.append(metab_colors.get(metab_label, 'gray'))
+
+
+
 
 # Plot
 plt.figure(figsize=(6, 6))
 box = plt.boxplot(boxplot_data, patch_artist=True)
 
 # Color the boxes based on the metabolite
-for patch, label in zip(box['boxes'], boxplot_labels):
-    metab = label.split('_')[0]
-    patch.set_facecolor(metab_colors.get(metab, 'gray'))
+# Apply colors
+for patch, color in zip(box['boxes'], boxplot_colors):
+    patch.set_facecolor(color)
     patch.set_alpha(0.5)
 
-# Customizing the plot
-for i in range(len(boxplot_labels)):
-    if i%2:
-        boxplot_labels[i] = str(boxplot_labels[i]) + str(' opt')
-    else: 
-        boxplot_labels[i] = str(boxplot_labels[i]) + str(' reg')
 plt.xticks(ticks=np.arange(1, len(boxplot_labels) + 1), labels=boxplot_labels, rotation=45)
+plt.gca().tick_params(axis='x', which='both', pad=5)  # Optional: adjust distance from axis
+plt.setp(plt.gca().get_xticklabels(), ha='right', rotation=45, x=-0.05)  # shift left
 plt.ylabel('gluCEST effect [%]')
 #plt.title('Distribution of gluCEST effect for regular vs optimized offset lists')
 

@@ -10,7 +10,7 @@ plt.rcParams.update({
     "axes.labelsize": 10,
     "axes.titlesize": 7,
     "legend.fontsize": 8,
-    "xtick.labelsize": 7,
+    "xtick.labelsize": 9,
     "ytick.labelsize": 7,
     "lines.linewidth": 1,
     "lines.markersize": 4,

@@ -209,7 +209,7 @@ def EVAL_GluCEST(data_path, seq_path, date):
 
     print('--- Plotting ---')
     
-    fig, ax = plt.subplots(figsize=(5, 4)) 
+    '''fig, ax = plt.subplots(figsize=(5, 4)) 
     vmin, vmax = 0.5, 1  # Z-spectra range
     im = ax.imshow(V_Z_corr_reshaped[:, :, slice_of_interest, offset_of_interest],vmin=vmin, vmax=vmax, cmap='rainbow')
     divider = make_axes_locatable(ax)
@@ -217,7 +217,7 @@ def EVAL_GluCEST(data_path, seq_path, date):
     cb = plt.colorbar(im, cax=cax, format="%.2f")
     cb.set_ticks(np.linspace(vmin, vmax, 5)) 
     ax.set_title("Z(Δω) = %.2f ppm" % w_offset_of_interest)
-    plt.show()
+    plt.show()'''
 
     main_path = data_path[-16:-10] + str('_') + data_path[-2:]
 
@@ -229,13 +229,24 @@ def EVAL_GluCEST(data_path, seq_path, date):
     cax = divider.append_axes("right", size="5%", pad=0.05)
     cb = plt.colorbar(im, cax=cax, format="%.2f")
     cb.set_ticks(np.linspace(vmin, vmax, 5)) 
+
+    ax.text(50, 98, r'10 mM', color='black', fontsize=11)
+    ax.text(84, 87, r'8 mM', color='black', fontsize=11)
+    ax.text(91, 58, r'6 mM', color='black', fontsize=11)
+    ax.text(68, 36, r'4 mM', color='black', fontsize=11)
+    ax.text(35, 44, r'2 mM', color='black', fontsize=11)
+    ax.text(21, 74, r'0 mM', color='black', fontsize=11)
+
+
+
     #ax.set_title("MTRasym(Δω) = %.2f ppm" % w_offset_of_interest)
     plot_name = main_path + str("_MTR_map")
-    my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf\concentrations"
+    my_path = r"c:\asb\ntnu\plotting\gluCEST_maps_labels\concentrations"
     save_path = os.path.join(my_path, plot_name + ".pdf")
     plt.savefig(save_path, format='pdf', bbox_inches='tight')
-    #plt.show()
+    plt.show()
     
+    input('stop')
     plt.figure(figsize=(5, 5), constrained_layout=True)
     plt.axvline(x=3, color='grey', linestyle='--', linewidth=0.8, alpha=0.7)
     plt.xlim([-5, 5]) 

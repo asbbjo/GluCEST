@@ -161,7 +161,7 @@ def EVAL_GluCEST(data_path, seq_path, date):
     offset_of_interest = np.where(offsets == desired_offset)[0]  
     w_offset_of_interest = offsets[offset_of_interest]
 
-    fig, ax = plt.subplots(figsize=(5, 5), constrained_layout=True) 
+    '''fig, ax = plt.subplots(figsize=(5, 5), constrained_layout=True) 
     vmin, vmax = 0.5, 1  # Z-spectra range
     im = ax.imshow(V_Z_corr_reshaped[324:428, 157:267, slice_of_interest, offset_of_interest],vmin=vmin, vmax=vmax, cmap='rainbow')
     divider = make_axes_locatable(ax)
@@ -169,7 +169,7 @@ def EVAL_GluCEST(data_path, seq_path, date):
     cb = plt.colorbar(im, cax=cax, format="%.2f")
     cb.set_ticks(np.linspace(vmin, vmax, 5)) 
     ax.set_title("Z(Δω) = %.2f ppm" % w_offset_of_interest)
-    plt.show()
+    plt.show()'''
 
     image_gluCEST = V_MTRasym_reshaped[324:428,157:267,slice_of_interest,offset_of_interest]
     V_mirrored = np.fliplr(image_gluCEST)
@@ -185,12 +185,22 @@ def EVAL_GluCEST(data_path, seq_path, date):
     cax = divider.append_axes("right", size="5%", pad=0.05)
     cb = plt.colorbar(im, cax=cax, format="%.2f")
     cb.set_ticks(np.linspace(vmin, vmax, 5)) 
+
+    ax.text(39, 87, r'10 mM', color='black', fontsize=11)
+    ax.text(73, 76, r'8 mM', color='black', fontsize=11)
+    ax.text(80, 47, r'6 mM', color='black', fontsize=11)
+    ax.text(57, 25, r'4 mM', color='black', fontsize=11)
+    ax.text(24, 33, r'2 mM', color='black', fontsize=11)
+    ax.text(10, 63, r'0 mM', color='black', fontsize=11)
+
     #ax.set_title("MTRasym(Δω) = %.2f ppm" % w_offset_of_interest)
     plot_name = main_path + str("_MTR_map")
-    my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf\concentrations"
+    my_path = r"c:\asb\ntnu\plotting\gluCEST_maps_labels"
     save_path = os.path.join(my_path, plot_name + ".pdf")
     plt.savefig(save_path, format='pdf', bbox_inches='tight')
     plt.show()
+
+    input()
     
     plt.figure(figsize=(5, 5), constrained_layout=True)
     plt.axvline(x=3, color='grey', linestyle='--', linewidth=0.8, alpha=0.7)

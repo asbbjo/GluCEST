@@ -182,12 +182,23 @@ def EVAL_GluCEST(data_path, seq_path):
     cax = divider.append_axes("right", size="5%", pad=0.05)
     cb = plt.colorbar(im, cax=cax, format="%.2f")
     cb.set_ticks(np.linspace(vmin, vmax, 5)) 
+
+    ax.text(74, 35, r'Gln 2 mM', color='black', fontsize=10)
+    ax.text(36, 37, r'Glu 10 mM', color='black', fontsize=10)
+    ax.text(19, 60, r'Taurine', color='black', fontsize=10)
+    ax.text(21, 65, r'2 mM', color='black', fontsize=10)
+    ax.text(39, 92, r'Cr 6 mM', color='black', fontsize=10)
+    ax.text(74, 94, r'NAA 10 mM', color='black', fontsize=10)
+    ax.text(90, 70, r'GABA 2 mM', color='black', fontsize=10)
+
     #ax.set_title("MTRasym(Δω) = %.2f ppm" % w_offset_of_interest)
     plot_name = main_path + str("_MTR_map")
-    my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf\different"
+    my_path = r"c:\asb\ntnu\plotting\gluCEST_maps_labels"
     save_path = os.path.join(my_path, plot_name + ".pdf")
     plt.savefig(save_path, format='pdf', bbox_inches='tight')
-    #plt.show()
+    plt.show()
+
+    input('stopS')
 
     # Choose metabolites
     label_names = ['Glu 10 mM', 'Gln 2 mM', 'GABA 2 mM', 'NAA 10 mM', 'Cr 6 mM', 'Taurine 2 mM']
