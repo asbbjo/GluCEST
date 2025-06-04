@@ -8,16 +8,16 @@ import pydicom
 import pypulseq as pp
 from csaps import csaps
 import scipy as sc
+from scipy.interpolate import interp1d
 
-# Store dicoms of each offsets in one folder
+# Store separate dicoms of each frequency offset in one folder
 # Create a sequence file for the acquisition
 # Run with pypulseq==1.4.2 and pydicom==3.0.1
 # Make sure to have Grassroots DICOM (pip install gdcm) and pylibjpeg (pip install pylibjpeg pylibjpeg-libjpeg)
 
-# Set general IEEE-style parameters
 plt.rcParams.update({
-    "text.usetex": False,  # Set to True if you have LaTeX installed
-    "font.size": 10,  # IEEE column text is usually around 8-9 pt
+    # Parameters for plotting
+    "font.size": 10,
     "font.family": 'serif',
     "axes.labelsize": 15,
     "axes.titlesize": 1,
@@ -30,7 +30,7 @@ plt.rcParams.update({
 })
 
 def ppval(p, x):
-    # helper function to evaluate piecewise polinomial
+    # Helper function to evaluate piecewise polinomial
     if callable(p):
         return p(x)
     else:
@@ -40,13 +40,12 @@ def ppval(p, x):
             result = result * x + p[i]
         return result
 
-def EVAL_GluCEST(data_path, seq_path):
+def EVAL_GluCEST(data_path, seq_path, date):
+    # Pipeline for glutamate-weighted CEST
     import pypulseq as pp # the import over is not found
     seq = pp.Sequence()
     print('--- Reading the sequence protocol ---')
     seq.read(seq_path)
-    '''seq.plot(time_range=[0, 0.05])'''  # Plot the sequence protocol. Adjust the time range as needed (in seconds). May need to downgrade to pypulse=1.3.1post1
-
     offsets = seq.get_definition("offsets_ppm")
     m0_offset = seq.get_definition("M0_offset")
     n_meas = len(offsets)
@@ -54,16 +53,16 @@ def EVAL_GluCEST(data_path, seq_path):
     dcmpath = data_path
     os.chdir(dcmpath)
 
-    #read data from dicom directory
+    # Read data from dicom directory
     collection = [pydicom.dcmread(os.path.join(dcmpath, filename)) for filename in sorted(os.listdir(dcmpath))]
-    # extract the volume data
+    # Extract the volume data
     V = np.stack([dcm.pixel_array for dcm in collection])
-    V = np.transpose(V[:,:,:,-1], (1, 2, 0)) # erase the last dimention due to jpeg format ([52,128,128,3] => [52,128,128])
+    V = np.transpose(V[:,:,:,-1], (1, 2, 0)) # erase the last dimention due to jpeg format ([f,x,y,rgb] => [f,x,y])
     sz = V.shape
     V = np.reshape(V, [sz[0], sz[1], n_meas, sz[2] // n_meas]).transpose(0, 1, 3, 2)
 
     # Vectorization
-    threshold = 100 #np.max(V)*0.1 # threshold of 10%
+    threshold = 100 # Change wrt. the noise in the image
     mask = np.squeeze(V[:, :, :, 0]) > threshold
     mask_idx = np.where(mask.ravel())[0]
     V_m_z = V.reshape(-1, n_meas).T
@@ -93,31 +92,25 @@ def EVAL_GluCEST(data_path, seq_path):
     
             Z_corr[:, ii] = ppval(pp, w + dB0_stack[ii])
 
-    # 1. Find unique positive values (ignore 0)
+    # Create symmetric offsets: negative and positive pairs
     w_pos_unique = np.unique(np.abs(w[w != 0]))
-
-    # 2. Create symmetric offsets: negative and positive pairs
     w_symm = np.sort(np.concatenate([-w_pos_unique, [0], w_pos_unique]))
-
-    # 3. Interpolate Z_corr onto this new symmetric grid
-    from scipy.interpolate import interp1d
-
     Z_corr_symm = np.zeros((len(w_symm), Z_corr.shape[1]))
 
     for i in range(Z_corr.shape[1]):
         interp_func = interp1d(w, Z_corr[:, i], kind='linear', fill_value="extrapolate")
         Z_corr_symm[:, i] = interp_func(w_symm)
 
-    # calculation of MTRasym spectrum
+    # Calculation of MTRasym spectrum
     Z_ref = Z_corr_symm[::-1, :]
     MTRasym = Z_ref - Z_corr_symm
 
     # Interpolating back to old w
     interp_back_func = interp1d(w_symm, Z_corr_symm, axis=0, kind='linear', fill_value='extrapolate')
-    Z_corr_symm_resampled = interp_back_func(w)  # shape [36, 16382]
+    Z_corr_symm_resampled = interp_back_func(w)  
 
     interp_back_func_mtr = interp1d(w_symm, MTRasym, axis=0, kind='linear', fill_value='extrapolate')
-    MTRasym_resampled = interp_back_func_mtr(w)  # shape [36, 16382]
+    MTRasym_resampled = interp_back_func_mtr(w) 
 
 
     # Vectorization Backwards
@@ -135,7 +128,7 @@ def EVAL_GluCEST(data_path, seq_path):
         ).transpose(1, 2, 3, 0)
 
     # Choose pixels for ROI
-    pixels_dict = {            # 250409 & 250410
+    pixels_dict = {  
         'glu 10 mm': [44,49,54,59],    
         'gln 2 mm': [42,47,73,78],    
         'gaba 2 mm': [59,64,86,91],    
@@ -145,34 +138,24 @@ def EVAL_GluCEST(data_path, seq_path):
     }
 
     print('--- Plotting GluCEST images ---')
-    slice_of_interest = 0 # pick slice for evaluation (0 if only one slice)
-    desired_offset = 3 # pick offset for evaluation (3 for GluCEST at 3 ppm)
+    slice_of_interest = 0 # Pick slice for evaluation (0 if only one slice)
+    desired_offset = 3 # Pick offset for evaluation (3 for GluCEST at 3 ppm)
     offset_of_interest = np.where(offsets == desired_offset)[0]  
     w_offset_of_interest = offsets[offset_of_interest]
 
     fig, ax = plt.subplots(figsize=(5, 5)) 
-    vmin, vmax = 0.5, 1  # Z-spectra range
+    vmin, vmax = 0.5, 1 
     im = ax.imshow(V_Z_corr_reshaped[:, :, slice_of_interest, offset_of_interest],vmin=vmin, vmax=vmax, cmap='rainbow')
     divider = make_axes_locatable(ax)
     cax = divider.append_axes("right", size="5%", pad=0.05)
     cb = plt.colorbar(im, cax=cax, format="%.2f")
     cb.set_ticks(np.linspace(vmin, vmax, 5)) 
     ax.set_title("Z(Δω) = %.2f ppm" % w_offset_of_interest)
-    #plt.show()
+    plt.show()
 
-    pixels_glu = pixels_dict.get('glu 10 mm')
+    pixels_glu = pixels_dict.get('glu 10 mm') # Evaluate for glu
     array_MTR = V_MTRasym_reshaped[pixels_glu[0]:pixels_glu[1],pixels_glu[2]:pixels_glu[3],slice_of_interest,1:] # 1: to remove the M0 scan
     flattened_vectors_MTR_glu = array_MTR.reshape(-1, array_MTR.shape[-1]) 
-
-    # For Bland Altman plotting
-    '''glu1 = V_MTRasym_reshaped[pixels_glu[0]:pixels_glu[1],pixels_glu[2]:pixels_glu[3],slice_of_interest,offset_of_interest]
-
-    flatten_glu1 = glu1.flatten()
-
-    # Save to text file
-    np.savetxt(r'C:\asb\ntnu\master\GluCEST\flattened_Taurine_opt.txt', flatten_glu1, fmt="%.6f")  # or fmt="%d" for integers'''
-    
-    main_path = data_path[-16:-10] + str('_') + data_path[-2:]
 
     MTR_max = np.max(flattened_vectors_MTR_glu)
     fig, ax = plt.subplots(figsize=(5, 5)) 
@@ -182,23 +165,8 @@ def EVAL_GluCEST(data_path, seq_path):
     cax = divider.append_axes("right", size="5%", pad=0.05)
     cb = plt.colorbar(im, cax=cax, format="%.2f")
     cb.set_ticks(np.linspace(vmin, vmax, 5)) 
-
-    ax.text(74, 35, r'Gln 2 mM', color='black', fontsize=10)
-    ax.text(36, 37, r'Glu 10 mM', color='black', fontsize=10)
-    ax.text(19, 60, r'Taurine', color='black', fontsize=10)
-    ax.text(21, 65, r'2 mM', color='black', fontsize=10)
-    ax.text(39, 92, r'Cr 6 mM', color='black', fontsize=10)
-    ax.text(74, 94, r'NAA 10 mM', color='black', fontsize=10)
-    ax.text(90, 70, r'GABA 2 mM', color='black', fontsize=10)
-
-    #ax.set_title("MTRasym(Δω) = %.2f ppm" % w_offset_of_interest)
-    plot_name = main_path + str("_MTR_map")
-    my_path = r"c:\asb\ntnu\plotting\gluCEST_maps_labels"
-    save_path = os.path.join(my_path, plot_name + ".pdf")
-    plt.savefig(save_path, format='pdf', bbox_inches='tight')
+    ax.set_title("MTRasym(Δω) = %.2f ppm" % w_offset_of_interest)
     plt.show()
-
-    input('stopS')
 
     # Choose metabolites
     label_names = ['Glu 10 mM', 'Gln 2 mM', 'GABA 2 mM', 'NAA 10 mM', 'Cr 6 mM', 'Taurine 2 mM']
@@ -233,19 +201,14 @@ def EVAL_GluCEST(data_path, seq_path):
         plt.ylabel(r'$S_{\mathrm{sat}}/S_{\mathrm{0}}$')
         plt.gca().invert_xaxis()
         plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
-        #plt.title("Z-spectra for different metabolites")
-        # Make axes box square in screen units
+        plt.title("Z-spectra for different metabolites")
         xrange = 10       
         yrange = 1.1 - 0.12
         aspect_ratio = xrange / yrange
         plt.gca().set_aspect(aspect_ratio, adjustable='box')
 
     plt.legend(loc='lower right')
-    plot_name = main_path + str("_Z_spectra")
-    my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf\different"
-    save_path = os.path.join(my_path, plot_name + ".pdf")
-    plt.savefig(save_path, format='pdf', bbox_inches='tight')
-    #plt.show()
+    plt.show()
 
     plt.figure(figsize=(5, 5))
 
@@ -266,31 +229,20 @@ def EVAL_GluCEST(data_path, seq_path):
         plt.xlabel('Δω [ppm]')
         plt.ylabel('MTRasym [%]')
         plt.gca().invert_xaxis()
-        #plt.title("MTRasym-spectra for different metabolites")
+        plt.title("MTRasym-spectra for different metabolites")
         plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
-        # Make axes box square in screen units
         xrange = 4         
         yrange = 12.1
         aspect_ratio = xrange / yrange
         plt.gca().set_aspect(aspect_ratio, adjustable='box')
 
     plt.legend(loc='upper right')
-    plot_name = main_path + str("_MTR_spectra")
-    my_path = r"c:\asb\ntnu\plotting\master_thesis_pdf\different"
-    save_path = os.path.join(my_path, plot_name + ".pdf")
-    plt.savefig(save_path, format='pdf', bbox_inches='tight')
-    #plt.show()
+    plt.show()
 
     # GluCEST effect for each [conc]
     metabolites = np.arange(len(label_names))
     m_avg = np.array(m_avg)
     m_sem = np.array(m_sem)
-
-    '''combined = np.concatenate((m_avg, m_sem))
-    plot_name = main_path + str("_MTRasym")
-    my_path = r"c:\asb\ntnu\plotting\auto_save_png\different"
-    save_path = os.path.join(my_path, plot_name + ".txt")
-    np.savetxt(save_path, combined, fmt='%s')'''
 
     # Plot data with error bars
     plt.figure(figsize=(5, 5))
@@ -302,12 +254,12 @@ def EVAL_GluCEST(data_path, seq_path):
     plt.xticks(metabolites, label_names)
     plt.legend()
     plt.grid(True, which='both', linestyle='--', linewidth=0.3, color='lightgrey', alpha=0.7)
-    #plt.show()
+    plt.show()
     
 
 if __name__ == "__main__":
     globals()["EVAL_GluCEST"] = EVAL_GluCEST 
     EVAL_GluCEST(
-        data_path=r'C:\asb\ntnu\MRIscans\250410\dicoms\E7', 
-        seq_path=r'C:\asb\ntnu\MRIscans\250410\seq_files\seq_file_E7.seq',
+        data_path=r'your_dicom_path', 
+        seq_path=r'your_seq_file_path',
     )
